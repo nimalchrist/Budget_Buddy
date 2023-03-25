@@ -4,7 +4,7 @@ import '../theme/Colors.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:calendar_timeline/calendar_timeline.dart';
+import '../utils/calendar_utils/calendar_timeline.dart';
 
 class StatisticsPage extends StatefulWidget {
   @override
@@ -84,21 +84,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       height: 25,
                     ),
                     CalendarTimeline(
-                      showYears: true,
                       initialDate: _selectedDate,
-                      firstDate:
-                          DateTime.now().subtract(const Duration(days: 365)),
-                      lastDate:
-                          DateTime.now().add(const Duration(days: 365 * 2)),
+                      firstDate: DateTime(2020, 1, 1),
+                      lastDate: DateTime.now().add(const Duration(days: 5)),
                       onDateSelected: (date) =>
                           setState(() => _selectedDate = date),
                       monthColor: const Color(0xff67727d),
-                      dayColor: Colors.black,
+                      dayColor: const Color(0xff67727d),
                       dayNameColor: const Color(0xFF333A47),
                       activeDayColor: Colors.white,
                       activeBackgroundDayColor: Colors.pink,
-                      dotsColor: const Color(0xFF333A47),
+                      dotsColor: const Color(0xffffffff),
                       locale: 'en',
+                      shrink: true,
                     ),
                     // Row(
                     //   children: [
