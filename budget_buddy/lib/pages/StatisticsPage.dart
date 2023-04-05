@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../utils/calendar_utils/calendar_timeline.dart';
+import '../http_Operations/httpServices.dart';
 
 class StatisticsPage extends StatefulWidget {
   @override
@@ -13,30 +14,44 @@ class StatisticsPage extends StatefulWidget {
 
 class _StatisticsPageState extends State<StatisticsPage> {
   late DateTime _selectedDate;
+  HttpService _httpService = HttpService();
+  late int _userId;
+  Map<String, dynamic>? _results;
+  int? _balance;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _selectedDate = DateTime.now();
+    _userId = 1000;
+    fetchTotalStats();
+    fetchMonthlyBalance();
+  }
+
+  void fetchTotalStats() async {
+    Map<String, dynamic>? results = await _httpService.getMonthlyTotal(
+      _userId,
+      _selectedDate.month,
+      _selectedDate.year,
+    );
+    setState(() {
+      _results = results;
+    });
+  }
+
+  void fetchMonthlyBalance() async {
+    int? balance = await _httpService.getCurrentMonthBalance(
+      _userId,
+      _selectedDate.month,
+      _selectedDate.year,
+    );
+    setState(() {
+      _balance = balance;
+    });
   }
 
   bool showAvg = false;
-
-  List expenses = [
-    {
-      "icon": Icons.arrow_back,
-      "color": blue,
-      "label": "Income",
-      "cost": "\$6593.75"
-    },
-    {
-      "icon": Icons.arrow_forward,
-      "color": red,
-      "label": "Expense",
-      "cost": "\$2645.50"
-    }
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +61,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // appbar container
             Container(
               decoration: BoxDecoration(
                 color: white,
@@ -83,88 +99,21 @@ class _StatisticsPageState extends State<StatisticsPage> {
                     const SizedBox(
                       height: 25,
                     ),
-                    CalendarTimeline(
-                      initialDate: _selectedDate,
-                      firstDate: DateTime(2020, 1, 1),
-                      lastDate: DateTime.now().add(const Duration(days: 5)),
-                      onDateSelected: (date) =>
-                          setState(() => _selectedDate = date),
-                      monthColor: const Color(0xff67727d),
-                      dayColor: const Color(0xff67727d),
-                      dayNameColor: const Color(0xFF333A47),
-                      activeDayColor: Colors.white,
-                      activeBackgroundDayColor: Colors.pink,
-                      dotsColor: const Color(0xffffffff),
-                      locale: 'en',
-                      shrink: true,
-                    ),
-                    // Row(
-                    //   children: [
-                    //     Expanded(
-                    //       child: Text(
-                    //         '${_selectedDate.month}/${_selectedDate.year}',
-                    //         textAlign: TextAlign.center,
-                    //       ),
-                    //     ),
-                    //   ],
+                    // CalendarTimeline(
+                    //   initialDate: _selectedDate,
+                    //   firstDate: DateTime(2020, 1, 1),
+                    //   lastDate: DateTime.now().add(const Duration(days: 6)),
+                    //   onDateSelected: (date) =>
+                    //       setState(() => _selectedDate = date),
+                    //   monthColor: const Color(0xff67727d),
+                    //   dayColor: const Color(0xff67727d),
+                    //   dayNameColor: const Color(0xFF333A47),
+                    //   activeDayColor: Colors.white,
+                    //   activeBackgroundDayColor: Colors.pink,
+                    //   dotsColor: const Color(0xffffffff),
+                    //   locale: 'en',
+                    //   shrink: true,
                     // ),
-                    // Row(
-                    //   crossAxisAlignment: CrossAxisAlignment.start,
-                    //   // month length
-
-                    //   children: List.generate(
-                    //     6,
-                    //     (index) {
-                    //       return GestureDetector(
-                    //         onTap: () {
-                    //           setState(() {
-                    //             activeDay = index;
-                    //           });
-                    //         },
-                    //         child: Container(
-                    //           width: (MediaQuery.of(context).size.width - 40) / 6,
-                    //           child: Column(
-                    //             children: [
-                    //               const Text(
-                    //                 // months[index]['label'],
-                    //                 "label name",
-                    //                 style: TextStyle(fontSize: 10),
-                    //               ),
-                    //               const SizedBox(
-                    //                 height: 10,
-                    //               ),
-                    //               Container(
-                    //                 decoration: BoxDecoration(
-                    //                     color: activeDay == index
-                    //                         ? primary
-                    //                         : black.withOpacity(0.02),
-                    //                     borderRadius: BorderRadius.circular(5),
-                    //                     border: Border.all(
-                    //                         color: activeDay == index
-                    //                             ? primary
-                    //                             : black.withOpacity(0.1))),
-                    //                 child: Padding(
-                    //                   padding: const EdgeInsets.only(
-                    //                       left: 12, right: 12, top: 7, bottom: 7),
-                    //                   child: Text(
-                    //                     'day name',
-                    //                     // months[index]['day'],
-                    //                     style: TextStyle(
-                    //                         fontSize: 10,
-                    //                         fontWeight: FontWeight.w600,
-                    //                         color: activeDay == index
-                    //                             ? white
-                    //                             : black),
-                    //                   ),
-                    //                 ),
-                    //               )
-                    //             ],
-                    //           ),
-                    //         ),
-                    //       );
-                    //     },
-                    //   ),
-                    // )
                   ],
                 ),
               ),
@@ -172,6 +121,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
             const SizedBox(
               height: 20,
             ),
+            // graph container
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: Container(
@@ -185,12 +135,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       color: grey.withOpacity(0.01),
                       spreadRadius: 10,
                       blurRadius: 3,
-                      // changes position of shadow
                     ),
                   ],
                 ),
                 child: Padding(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: Stack(
                     children: [
                       Padding(
@@ -199,8 +148,8 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
+                          children: [
+                            const Text(
                               "Net balance",
                               style: TextStyle(
                                 fontWeight: FontWeight.w500,
@@ -208,16 +157,24 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                 color: Color(0xff67727d),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
-                            Text(
-                              "\$2446.90",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 25,
-                              ),
-                            )
+                            _balance != null
+                                ? Text(
+                                    "Rs. $_balance",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25,
+                                    ),
+                                  )
+                                : const Text(
+                                    "No data",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25,
+                                    ),
+                                  )
                           ],
                         ),
                       ),
@@ -240,100 +197,238 @@ class _StatisticsPageState extends State<StatisticsPage> {
             const SizedBox(
               height: 20,
             ),
-            Wrap(
-              spacing: 20,
-              children: List.generate(
-                expenses.length,
-                (index) {
-                  return Container(
-                    width: (size.width - 60) / 2,
-                    height: 170,
-                    decoration: BoxDecoration(
-                      color: white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: grey.withOpacity(0.01),
-                          spreadRadius: 10,
-                          blurRadius: 3,
-                          // changes position of shadow
+            // last two containers
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: (size.width - 60) / 2,
+                  height: 170,
+                  decoration: BoxDecoration(
+                    color: white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: grey.withOpacity(0.01),
+                        spreadRadius: 10,
+                        blurRadius: 3,
+                        // changes position of shadow
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 25,
+                      right: 25,
+                      top: 20,
+                      bottom: 20,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.arrow_back,
+                              color: white,
+                            ),
+                          ),
                         ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Budget",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Color(0xff67727d),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            _results != null
+                                ? Text(
+                                    "Rs. ${_results!["incomes"]}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  )
+                                : const Text(
+                                    "No data",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                          ],
+                        )
                       ],
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 25, right: 25, top: 20, bottom: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: expenses[index]['color']),
-                            child: Center(
-                                child: Icon(
-                              expenses[index]['icon'],
-                              color: white,
-                            )),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                expenses[index]['label'],
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 13,
-                                    color: Color(0xff67727d)),
-                              ),
-                              const SizedBox(
-                                height: 8,
-                              ),
-                              Text(
-                                expenses[index]['cost'],
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              )
-                            ],
-                          )
-                        ],
+                  ),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                Container(
+                  width: (size.width - 60) / 2,
+                  height: 170,
+                  decoration: BoxDecoration(
+                    color: white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: grey.withOpacity(0.01),
+                        spreadRadius: 10,
+                        blurRadius: 3,
+                        // changes position of shadow
                       ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 25,
+                      right: 25,
+                      top: 20,
+                      bottom: 20,
                     ),
-                  );
-                },
-              ),
-            )
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.red,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.arrow_forward,
+                              color: white,
+                            ),
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Expense",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                color: Color(0xff67727d),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 8,
+                            ),
+                            _results != null
+                                ? Text(
+                                    "Rs. ${_results!["expenses"]}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  )
+                                : const Text(
+                                    "No data",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
     );
   }
-
-  // Widget getBody() {
-  //   var size = MediaQuery.of(context).size;
-  //   late DateTime _selectedDate;
-
-  //   _selectedDate = DateTime.now();
-
-  //   List expenses = [
-  //     {
-  //       "icon": Icons.arrow_back,
-  //       "color": blue,
-  //       "label": "Income",
-  //       "cost": "\$6593.75"
-  //     },
-  //     {
-  //       "icon": Icons.arrow_forward,
-  //       "color": red,
-  //       "label": "Expense",
-  //       "cost": "\$2645.50"
-  //     }
-  //   ];
-
-  // }
 }
+
+
+            // Wrap(
+            //   spacing: 20,
+            //   children: List.generate(
+            //     expenses.length,
+            //     (index) {
+            //       return Container(
+            //         width: (size.width - 60) / 2,
+            //         height: 170,
+            //         decoration: BoxDecoration(
+            //           color: white,
+            //           borderRadius: BorderRadius.circular(12),
+            //           boxShadow: [
+            //             BoxShadow(
+            //               color: grey.withOpacity(0.01),
+            //               spreadRadius: 10,
+            //               blurRadius: 3,
+            //               // changes position of shadow
+            //             ),
+            //           ],
+            //         ),
+            //         child: Padding(
+            //           padding: const EdgeInsets.only(
+            //               left: 25, right: 25, top: 20, bottom: 20),
+            //           child: Column(
+            //             crossAxisAlignment: CrossAxisAlignment.start,
+            //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //             children: [
+            //               Container(
+            //                 width: 40,
+            //                 height: 40,
+            //                 decoration: BoxDecoration(
+            //                     shape: BoxShape.circle,
+            //                     color: expenses[index]['color']),
+            //                 child: Center(
+            //                     child: Icon(
+            //                   expenses[index]['icon'],
+            //                   color: white,
+            //                 )),
+            //               ),
+            //               Column(
+            //                 crossAxisAlignment: CrossAxisAlignment.start,
+            //                 children: [
+            //                   Text(
+            //                     expenses[index]['label'],
+            //                     style: const TextStyle(
+            //                         fontWeight: FontWeight.w500,
+            //                         fontSize: 13,
+            //                         color: Color(0xff67727d)),
+            //                   ),
+            //                   const SizedBox(
+            //                     height: 8,
+            //                   ),
+            //                   Text(
+            //                     expenses[index]['cost'],
+            //                     style: const TextStyle(
+            //                       fontWeight: FontWeight.bold,
+            //                       fontSize: 20,
+            //                     ),
+            //                   )
+            //                 ],
+            //               )
+            //             ],
+            //           ),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // )
