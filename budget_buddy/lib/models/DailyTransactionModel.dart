@@ -14,7 +14,7 @@ class DailyTransactionModel {
   final int expenseId;
   final int userId;
   final String categoryName;
-  final int amount;
+  final dynamic amount;
   final DateTime expenseDate;
   final String? message;
 
@@ -24,7 +24,7 @@ class DailyTransactionModel {
         expenseId: 0,
         userId: 0,
         categoryName: '',
-        amount: 0,
+        amount: 0.0,
         expenseDate: DateTime(0),
         message: json['message'],
       );

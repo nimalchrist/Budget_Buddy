@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:budget_buddy/models/CategoryModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/DailyTransactionModel.dart';
 
 class HttpService {
-  final String ip = "192.168.34.221";
+  final String ip = "192.168.178.221";
 
 // get all the posts
   Future<List<DailyTransactionModel>> getDailyTransactions(
@@ -35,8 +36,8 @@ class HttpService {
     http.Response res = await http.post(url, body: map);
     var rawJsonTotalResponse = jsonDecode(res.body);
 
-    int totalMonthIncome = rawJsonTotalResponse[0]["total_income"];
-    int totalMonthExpense = rawJsonTotalResponse[0]["total_expenses"];
+    dynamic totalMonthIncome = rawJsonTotalResponse[0]["total_income"];
+    dynamic totalMonthExpense = rawJsonTotalResponse[0]["total_expenses"];
     if (totalMonthExpense != null && totalMonthIncome != null) {
       return {
         "expenses": totalMonthExpense,
@@ -47,7 +48,8 @@ class HttpService {
     }
   }
 
-  Future<int?> getCurrentMonthBalance(int userId, int month, int year) async {
+  Future<dynamic> getCurrentMonthBalance(
+      int userId, int month, int year) async {
     final url = Uri.parse('http://$ip:3000/balance/$userId');
     final response = await http.post(url, body: {
       'current_month': month.toString(),
@@ -57,6 +59,42 @@ class HttpService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return data[0]['balance'];
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<String>> addExpense(
+      int userId, int categoryId, String amount, String date) async {
+    final url = Uri.parse('http://$ip:3000/$userId/addExpense');
+    var map = <String, dynamic>{};
+    map["category_id"] = categoryId.toString();
+    map["amount"] = amount;
+    map["date"] = date;
+
+    final response = await http.post(url, body: map);
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      print(response.headers);
+      print(response.body);
+      return ["200", data[0]['msg']];
+    } else {
+      return [data[0]['msg']];
+    }
+  }
+
+  Future<List<CategoryModel>?> fetchCategories() async {
+    final url = Uri.parse('http://$ip:3000/categories');
+    http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      List<CategoryModel> categories = data
+          .map(
+            (dynamic item) => CategoryModel.fromJson(item),
+          )
+          .toList();
+      return categories;
     } else {
       return null;
     }

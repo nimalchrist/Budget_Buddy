@@ -70,3 +70,30 @@ exports.getMonthlyBalanceAmount = (req, res) => {
     }
   });
 };
+
+exports.addExpenseDaily = (req, res) => {
+  let userId = req.params.user_id;
+  let categoryId = req.body.category_id;
+  let expenseAmount = req.body.amount;
+  let expenseDate = req.body.date;
+
+  values = [userId, categoryId, expenseAmount, expenseDate];
+  const queryString = `INSERT INTO expenses(user_id, category_id, amount, expense_date) VALUES(?, ?, ?, ?)`;
+
+  conn.query(queryString, values, function (err, results) {
+    if (err) {
+      console.log(results);
+      console.log(err);
+      return res.status(400).json([{ msg: "No budget is set" }]);
+    } else {
+      return res.status(200).json([{ msg: "Added successfully" }]);
+    }
+  });
+};
+
+exports.fetchCategories = (req, res) => {
+  conn.query("SELECT * FROM categories", function (err, data, fields) {
+    if (err) return err;
+    res.status(200).json(data);
+  });
+};
