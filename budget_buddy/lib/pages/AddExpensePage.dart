@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 
 class AddExpensePage extends StatefulWidget {
   final Function refreshCallback;
-  const AddExpensePage({super.key, required this.refreshCallback});
+  const AddExpensePage({Key? key, required this.refreshCallback})
+      : super(key: key);
   @override
   _AddExpensePageState createState() => _AddExpensePageState();
 }
@@ -15,7 +16,7 @@ class AddExpensePage extends StatefulWidget {
 class _AddExpensePageState extends State<AddExpensePage> {
   int activeCategory = 0;
   HttpService httpService = HttpService();
-  final TextEditingController _expenseAmount = TextEditingController();
+  final TextEditingController _expenseAmount = TextEditingController(text: '0');
   List<CategoryModel>? _categories;
   String? _selectedDate;
   int userId = 1000;
@@ -274,7 +275,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                               color: Color(0xff67727d),
                             ),
                           ),
-                          TextField(
+                          TextFormField(
                             keyboardType: TextInputType.number,
                             controller: _expenseAmount,
                             cursorColor: black,
@@ -283,6 +284,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
                               fontWeight: FontWeight.bold,
                               color: black,
                             ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Name is required';
+                              }
+                              return null;
+                            },
                             decoration: const InputDecoration(
                               hintText: "Eg. 120",
                               hintStyle: TextStyle(
@@ -309,7 +316,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         icon: const Icon(Icons.arrow_forward),
                         color: white,
                         onPressed: () async {
-                          if (_selectedDate != null && _expenseAmount != null) {
+                          if (_selectedDate != null) {
                             // api call
                             List<dynamic> responses =
                                 await httpService.addExpense(

@@ -76,18 +76,36 @@ exports.addExpenseDaily = (req, res) => {
   let categoryId = req.body.category_id;
   let expenseAmount = req.body.amount;
   let expenseDate = req.body.date;
+  dateChecker = new Date(expenseDate);
 
-  values = [userId, categoryId, expenseAmount, expenseDate];
-  const queryString = `INSERT INTO expenses(user_id, category_id, amount, expense_date) VALUES(?, ?, ?, ?)`;
-
-  conn.query(queryString, values, function (err, results) {
-    if (err) {
-      console.log(results);
-      console.log(err);
-      return res.status(400).json([{ msg: "No budget is set" }]);
-    } else {
-      return res.status(200).json([{ msg: "Added successfully" }]);
+  // First, check if the user has set their budget for the current month
+  const budgetQuery = `SELECT amount FROM budgets WHERE user_id = ? AND MONTH(income_date) = ? AND YEAR(income_date) = ?`;
+  const budgetValues = [
+    userId,
+    dateChecker.getMonth() + 1,
+    dateChecker.getFullYear(),
+  ];
+  conn.query(budgetQuery, budgetValues, function (budgetErr, budgetResults) {
+    if (budgetErr) {
+      return res.status(500).json([{ msg: "Server error" }]);
     }
+    if (budgetResults.length === 0) {
+      // The user hasn't set their budget for the current month, so return an error
+      return res.status(400).json([{ msg: "No budget is set for this month" }]);
+    }
+
+    // If the user has set their budget, add the expense
+    const values = [userId, categoryId, expenseAmount, expenseDate];
+    const queryString = `INSERT INTO expenses(user_id, category_id, amount, expense_date) VALUES(?, ?, ?, ?)`;
+
+    conn.query(queryString, values, function (err, results) {
+      if (err) {
+        console.log(err);
+        return res.status(500).json([{ msg: "Insert Server error" }]);
+      } else {
+        return res.status(200).json([{ msg: "Added successfully" }]);
+      }
+    });
   });
 };
 
@@ -95,5 +113,21 @@ exports.fetchCategories = (req, res) => {
   conn.query("SELECT * FROM categories", function (err, data, fields) {
     if (err) return err;
     res.status(200).json(data);
+  });
+};
+
+exports.fetchGraphData = (req, res) => {
+  let userId = req.params.user_id;
+
+  const queryString = `SELECT DAY(expense_date) as day, SUM(amount) as daily_total FROM expenses WHERE user_id = ? AND MONTH(expense_date) = MONTH(CURDATE()) AND YEAR(expense_date) = YEAR(CURDATE()) GROUP BY user_id, expense_date ORDER BY day ASC`;
+
+  values = [userId];
+
+  conn.query(queryString, values, function (err, data, fields) {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(data);
+    }
   });
 };

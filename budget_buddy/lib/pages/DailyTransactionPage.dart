@@ -138,7 +138,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage> {
             ),
             // card section
             _dailyTransactions != null
-                ? _dailyTransactions!.length <= 1
+                ? _dailyTransactions![0].message != null
                     ? const Center(
                         child: Text(
                           "No transactions",

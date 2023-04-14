@@ -1,8 +1,7 @@
 import '../theme/Colors.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import '../http_Operations/httpServices.dart';
+import '../utils/lineChart/GraphWidget.dart';
 
 class StatisticsPage extends StatefulWidget {
   @override
@@ -183,17 +182,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             ],
                           ),
                         ),
-                        // Positioned(
-                        //   bottom: 0,
-                        //   child: Container(
-                        //     width: (size.width - 20),
-                        //     height: 150,
-                        //     child: LineChart(
-
-                        //         // mainData(),
-                        //         ),
-                        //   ),
-                        // )
+                        Positioned(
+                          bottom: 0,
+                          child: SizedBox(
+                            width: (size.width - 20),
+                            height: 150,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: ExpenseLineChart(),
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),

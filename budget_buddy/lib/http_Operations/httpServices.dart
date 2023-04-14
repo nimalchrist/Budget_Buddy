@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:budget_buddy/models/CategoryModel.dart';
+import 'package:budget_buddy/models/DailyTransactionModel.dart';
+import 'package:budget_buddy/models/GraphDataModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../models/DailyTransactionModel.dart';
 
 class HttpService {
-  final String ip = "192.168.178.221";
+  final String ip = "192.168.181.221";
 
 // get all the posts
   Future<List<DailyTransactionModel>> getDailyTransactions(
@@ -99,6 +100,37 @@ class HttpService {
       return null;
     }
   }
+
+  Future<List<GraphDataModel>?> fetchGraphData(int userId) async {
+    try {
+      final url = Uri.parse('http://$ip:3000/fetchGraphData/$userId');
+      print(url);
+      http.Response response = await http.post(url);
+
+      if (response.statusCode == 200) {
+        if (response.body.isNotEmpty) {
+          List<dynamic> data = jsonDecode(response.body);
+          print(data);
+          List<GraphDataModel> graphdata = data
+              .map(
+                (dynamic item) => GraphDataModel.fromJson(item),
+              )
+              .toList();
+          print(graphdata);
+          return graphdata;
+        } else {
+          return null;
+        }
+      } else {
+        print('Request failed with status: ${response.statusCode}.');
+        return null;
+      }
+    } catch (e) {
+      print('Error while fetching graph data: $e');
+      return null;
+    }
+  }
+
   // register user
   // Future<List<dynamic>> registerUser(
   //     String username, String email, String password) async {

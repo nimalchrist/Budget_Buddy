@@ -34,13 +34,63 @@ class _RootAppState extends State<RootApp> {
       bottomNavigationBar: getFooter(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddExpensePage(
-                refreshCallback: refreshPages,
-              ),
-            ),
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text(
+                      'Close',
+                      style: TextStyle(
+                        color: Colors.pink,
+                      ),
+                    ),
+                  ),
+                ],
+                title: const Text(
+                  "What do you want to do?",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
+                  ),
+                ),
+                elevation: 1,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.pink),
+                      ),
+                      onPressed: () {},
+                      child: const Text("Set Budget"),
+                    ),
+                    ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.pink),
+                      ),
+                      onPressed: () {
+                        // Handle "Add Expense" option
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddExpensePage(
+                              refreshCallback: refreshPages,
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Text("Add Expense"),
+                    ),
+                  ],
+                ),
+              );
+            },
           );
         },
         backgroundColor: Colors.pink,
