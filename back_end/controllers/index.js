@@ -101,7 +101,7 @@ exports.addExpenseDaily = (req, res) => {
     conn.query(queryString, values, function (err, results) {
       if (err) {
         console.log(err);
-        return res.status(500).json([{ msg: "Insert Server error" }]);
+        return res.status(500).json([{ msg: "Server error" }]);
       } else {
         return res.status(200).json([{ msg: "Added successfully" }]);
       }
@@ -128,6 +128,26 @@ exports.fetchGraphData = (req, res) => {
       res.status(500).json(err);
     } else {
       res.status(200).json(data);
+    }
+  });
+};
+
+exports.isBudgetSetted = (req, res) => {
+  const userId = req.params.user_id;
+  const month = req.params.month;
+  const year = req.params.year;
+
+  const queryString = `SELECT amount FROM budgets WHERE user_id = ? AND MONTH(income_date) = ? AND YEAR(income_date) = ?;`;
+
+  const values = [userId, month, year];
+  conn.query(queryString, values, function (err, data) {
+    if (err) {
+      res.status(500).json(err);
+    }
+    if (data.length == 0) {
+      res.status(200).json({ isSet: false });
+    } else {
+      res.status(200).json({ isSet: true });
     }
   });
 };

@@ -1,3 +1,4 @@
+import 'package:budget_buddy/services/NotificationService.dart';
 import 'package:flutter/material.dart';
 import './pages/RootApp.dart';
 

@@ -32,4 +32,6 @@ router.route("/:user_id/addExpense").post(controllers.addExpenseDaily);
 // to fetch for graph data
 router.route("/fetchGraphData/:user_id").post(controllers.fetchGraphData);
 
+router.route("/budgets/:user_id/:month/:year").get(controllers.isBudgetSetted);
+
 module.exports = router;

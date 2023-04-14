@@ -104,19 +104,16 @@ class HttpService {
   Future<List<GraphDataModel>?> fetchGraphData(int userId) async {
     try {
       final url = Uri.parse('http://$ip:3000/fetchGraphData/$userId');
-      print(url);
       http.Response response = await http.post(url);
 
       if (response.statusCode == 200) {
         if (response.body.isNotEmpty) {
           List<dynamic> data = jsonDecode(response.body);
-          print(data);
           List<GraphDataModel> graphdata = data
               .map(
                 (dynamic item) => GraphDataModel.fromJson(item),
               )
               .toList();
-          print(graphdata);
           return graphdata;
         } else {
           return null;
@@ -127,6 +124,21 @@ class HttpService {
       }
     } catch (e) {
       print('Error while fetching graph data: $e');
+      return null;
+    }
+  }
+
+  Future<bool?> isButgetSetted(int userId) async {
+    int month = DateTime.now().month;
+    int year = DateTime.now().year;
+    final url = Uri.parse('http://$ip:3000/butgets/$userId/$month/$year');
+
+    http.Response response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['isSet'];
+    } else {
       return null;
     }
   }

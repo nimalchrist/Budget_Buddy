@@ -209,7 +209,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     ),
                   )
                 : const Padding(
-                    padding: EdgeInsets.only(left: 158.0),
+                    padding: EdgeInsets.only(
+                      left: 158.0,
+                      top: 30,
+                    ),
                     child: CircularProgressIndicator(
                       color: Colors.pink,
                     ),
