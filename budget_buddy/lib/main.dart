@@ -2,7 +2,9 @@ import 'package:budget_buddy/services/NotificationService.dart';
 import 'package:flutter/material.dart';
 import './pages/RootApp.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().initNotifications();
   runApp(const MyApp());
 }
 

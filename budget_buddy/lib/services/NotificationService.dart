@@ -44,14 +44,15 @@ import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   static HttpService httpService = HttpService();
-  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  static Future initialize() async {
+  Future<void> initNotifications() async {
+    print("Method called");
     tz.initializeTimeZones();
-    final AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@drawable/ic_launcher');
-    final InitializationSettings initializationSettings =
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('ic_launcher');
+    const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
     await _notificationsPlugin.initialize(initializationSettings);
 
@@ -64,54 +65,37 @@ class NotificationService {
     }
   }
 
-  static Future _scheduleNotifications() async {
-    var now = DateTime.now();
-    var notification1Time = tz.TZDateTime(
-        tz.local, now.year, now.month, now.day, 10, 0, 0); // 10:00 AM
-    var notification2Time = tz.TZDateTime(
-        tz.local, now.year, now.month, now.day, 18, 0, 0); // 6:00 PM
-
+  Future _scheduleNotifications() async {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'budget_notifications',
-      'Budget Notifications',
+      'budget01',
+      'Budget Remainder',
+      channelDescription: "Hey, set the budget for this month :)",
       importance: Importance.max,
       priority: Priority.high,
     );
     var platformChannelSpecifics =
         NotificationDetails(android: androidPlatformChannelSpecifics);
 
-    // Schedule the first notification
-    await _notificationsPlugin.zonedSchedule(
-        0,
-        'Set Your Budget',
-        'Please set your budget for the month.',
-        notification1Time,
-        platformChannelSpecifics,
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
-
-    // Schedule the second notification
-    await _notificationsPlugin.zonedSchedule(
-        1,
-        'Set Your Budget',
-        'Please set your budget for the day.',
-        notification2Time,
-        platformChannelSpecifics,
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime);
+    await _notificationsPlugin.periodicallyShow(
+      0,
+      "Set your Budget",
+      "Please set your budget for this month",
+      RepeatInterval.daily,
+      platformChannelSpecifics,
+    );
   }
 
-  static Future displayNotification({
+  Future displayNotification({
     int id = 0,
     String? title,
     String? body,
+    String? payload,
   }) async {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'your_channel_id',
-      'your_channel_name',
-      channelDescription: "You Not yet setted budget for this month",
+      'Budget02',
+      'Manual Notification',
+      channelDescription: "You don't setted budget for this month",
+      channelShowBadge: true,
       importance: Importance.max,
       priority: Priority.high,
     );
@@ -126,3 +110,35 @@ class NotificationService {
     );
   }
 }
+
+    // var now = DateTime.now();
+
+    // var notification1Time = tz.TZDateTime(
+    //     tz.local, now.year, now.month, now.day, 16, 30, 0); // 10:00 AM
+
+    // var notification2Time = tz.TZDateTime(
+    //     tz.local, now.year, now.month, now.day, 18, 0, 0); // 6:00 PM
+
+    // Schedule the first notification
+    // await _notificationsPlugin.zonedSchedule(
+    //   0,
+    //   'Set Your Budget',
+    //   'Please set your budget for the month.',
+    //   notification1Time,
+    //   platformChannelSpecifics,
+    //   androidAllowWhileIdle: true,
+    //   uiLocalNotificationDateInterpretation:
+    //       UILocalNotificationDateInterpretation.absoluteTime,
+    // );
+
+    // // Schedule the second notification
+    // await _notificationsPlugin.zonedSchedule(
+    //   1,
+    //   'Set Your Budget',
+    //   'Please set your budget for the month',
+    //   notification2Time,
+    //   platformChannelSpecifics,
+    //   androidAllowWhileIdle: true,
+    //   uiLocalNotificationDateInterpretation:
+    //       UILocalNotificationDateInterpretation.absoluteTime,
+    // );

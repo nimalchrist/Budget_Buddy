@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpService {
-  final String ip = "192.168.181.221";
+  final String ip = "192.168.139.221";
 
 // get all the posts
   Future<List<DailyTransactionModel>> getDailyTransactions(
@@ -131,7 +131,7 @@ class HttpService {
   Future<bool?> isButgetSetted(int userId) async {
     int month = DateTime.now().month;
     int year = DateTime.now().year;
-    final url = Uri.parse('http://$ip:3000/butgets/$userId/$month/$year');
+    final url = Uri.parse('http://$ip:3000/budgets/$userId/$month/$year');
 
     http.Response response = await http.get(url);
 
