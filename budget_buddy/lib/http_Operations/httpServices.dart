@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:budget_buddy/models/CategoryModel.dart';
 import 'package:budget_buddy/models/DailyTransactionModel.dart';
 import 'package:budget_buddy/models/GraphDataModel.dart';
@@ -76,8 +75,6 @@ class HttpService {
     final response = await http.post(url, body: map);
     final data = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      print(response.headers);
-      print(response.body);
       return ["200", data[0]['msg']];
     } else {
       return [data[0]['msg']];
@@ -141,6 +138,31 @@ class HttpService {
     } else {
       return null;
     }
+  }
+
+  Future<List<String>?> deleteExpense(int expenseId) async {
+    final url = Uri.parse('http://$ip:3000/deleteExpense/$expenseId');
+
+    http.Response response = await http.post(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return ["success", data["msg"]];
+    }
+    return null;
+  }
+
+  Future<List<String>?> editExpense(
+      int expenseId, dynamic expenseAmount) async {
+    final url = Uri.parse('http://$ip:3000/editExpense/$expenseId');
+    var map = <String, dynamic>{};
+    map["amount"] = expenseAmount;
+
+    http.Response response = await http.post(url, body: map);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return ["Success", data['msg']];
+    }
+    return null;
   }
 
   // register user

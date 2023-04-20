@@ -45,6 +45,7 @@ dependencies:
   syncfusion_flutter_charts: ^21.1.38
   flutter_local_notifications: ^13.0.0
   timezone: ^0.9.1
+  connectivity: ^3.0.6
 
 dev_dependencies:
   flutter_test:

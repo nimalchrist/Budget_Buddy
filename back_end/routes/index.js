@@ -33,5 +33,7 @@ router.route("/:user_id/addExpense").post(controllers.addExpenseDaily);
 router.route("/fetchGraphData/:user_id").post(controllers.fetchGraphData);
 
 router.route("/budgets/:user_id/:month/:year").get(controllers.isBudgetSetted);
+router.route("/editExpense/:expense_id").post(controllers.editExpense);
+router.route("/deleteExpense/:expense_id").post(controllers.deleteExpense);
 
 module.exports = router;

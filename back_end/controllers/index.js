@@ -151,3 +151,56 @@ exports.isBudgetSetted = (req, res) => {
     }
   });
 };
+
+exports.editExpense = (req, res) => {
+  const expenseId = req.params.expense_id;
+  const expenseAmount = req.body.amount;
+
+  if (!expenseId || !expenseAmount || isNaN(expenseAmount)) {
+    res.status(400).json({ msg: "Invalid request" });
+    return;
+  }
+
+  const queryString = "UPDATE expenses SET amount = ? WHERE expense_id = ?;";
+  const values = [expenseAmount, expenseId];
+
+  conn.query(queryString, values, function (err, data) {
+    if (err) {
+      res.status(500).json(err);
+      return;
+    }
+
+    // Check that at least one row was updated
+    if (data.affectedRows === 0) {
+      res.status(404).json({ msg: "Expense not found" });
+      return;
+    }
+
+    res.status(200).json({ msg: "Updated successfully" });
+  });
+};
+
+exports.deleteExpense = (req, res) => {
+  const expenseId = req.params.expense_id;
+
+  if (!expenseId) {
+    res.status(400).json({ msg: "Invalid request" });
+    return;
+  }
+
+  const queryString = "DELETE from expenses where expense_id = ?";
+  values = [expenseId];
+
+  conn.query(queryString, values, function (err, data) {
+    if (err) {
+      res.status(500).json({ msg: "Unexpected error happened" });
+      return;
+    }
+
+    if (data.affectedRows === 0) {
+      res.status(404).json({ msg: "Expense not found" });
+      return;
+    }
+    res.status(200).json({ msg: "Deleted successfully" });
+  });
+};

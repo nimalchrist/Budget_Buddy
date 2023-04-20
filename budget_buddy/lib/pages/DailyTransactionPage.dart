@@ -1,3 +1,5 @@
+import 'package:budget_buddy/pages/editExpensePage.dart';
+
 import '../theme/Colors.dart';
 import 'package:flutter/material.dart';
 import '../http_Operations/httpServices.dart';
@@ -10,7 +12,8 @@ class DailyTransactionPage extends StatefulWidget {
   _DailyTransactionPageState createState() => _DailyTransactionPageState();
 }
 
-class _DailyTransactionPageState extends State<DailyTransactionPage> {
+class _DailyTransactionPageState extends State<DailyTransactionPage>
+    with SingleTickerProviderStateMixin {
   HttpService httpService = HttpService();
   List<DailyTransactionModel>? _dailyTransactions;
   DateTime currentdate = DateTime.now();
@@ -19,6 +22,11 @@ class _DailyTransactionPageState extends State<DailyTransactionPage> {
   late DateTime _selectedDate;
   GlobalKey<_DailyTransactionPageState> dailyTransactionsPageKey =
       GlobalKey<_DailyTransactionPageState>();
+  int _selectedContainerIndex = -1;
+
+  bool _isOverlayVisible = false;
+  late AnimationController _animationController;
+  late Animation<double> _opacityAnimation;
 
   @override
   void initState() {
@@ -26,14 +34,33 @@ class _DailyTransactionPageState extends State<DailyTransactionPage> {
     date = DateFormat('yyyy-MM-dd').format(currentdate);
     _selectedDate = DateTime.now();
     fetchDailyTransactions();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_animationController);
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: grey.withOpacity(0.05),
-      body: getBody(),
-    );
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _toggleOverlayVisibility(int index) {
+    if (_selectedContainerIndex == index) {
+      setState(() {
+        _isOverlayVisible = !_isOverlayVisible;
+      });
+      if (_isOverlayVisible) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    }
   }
 
   void fetchDailyTransactions() async {
@@ -60,8 +87,17 @@ class _DailyTransactionPageState extends State<DailyTransactionPage> {
     return formattedDate;
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: grey.withOpacity(0.05),
+      body: getBody(),
+    );
+  }
+
   Widget getBody() {
     var size = MediaQuery.of(context).size;
+    bool setBottomChild = false;
     return RefreshIndicator(
       edgeOffset: 140,
       color: Colors.pink,
@@ -149,104 +185,298 @@ class _DailyTransactionPageState extends State<DailyTransactionPage> {
                           ),
                         ),
                       )
+                    // list tile section
                     : Padding(
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: Column(
                           children: List.generate(
                             _dailyTransactions!.length,
                             (index) {
-                              return Column(
+                              return Stack(
                                 children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SizedBox(
-                                        width: (size.width - 40) * 0.7,
-                                        child: Row(
+                                  GestureDetector(
+                                    onTap: () {
+                                      _toggleOverlayVisibility(index);
+                                      setState(() {
+                                        _selectedContainerIndex = index;
+                                      });
+                                    },
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Container(
-                                              width: 50,
-                                              height: 50,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: grey.withOpacity(0.1),
-                                              ),
-                                              child: const Center(
-                                                child: Icon(
-                                                  size: 30,
-                                                  Icons.currency_rupee_sharp,
-                                                ),
+                                            SizedBox(
+                                              width: (size.width - 40) * 0.7,
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width: 50,
+                                                    height: 50,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color:
+                                                          grey.withOpacity(0.1),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Icon(
+                                                        size: 30,
+                                                        Icons
+                                                            .currency_rupee_sharp,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 15),
+                                                  SizedBox(
+                                                    width:
+                                                        (size.width - 90) * 0.5,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          _dailyTransactions![
+                                                                  index]
+                                                              .categoryName,
+                                                          style: const TextStyle(
+                                                              fontSize: 15,
+                                                              color: black,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                        const SizedBox(
+                                                            height: 5),
+                                                        Text(
+                                                          convertUtcToIst(
+                                                            _dailyTransactions![
+                                                                    index]
+                                                                .expenseDate
+                                                                .toString(),
+                                                          ),
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: black
+                                                                .withOpacity(
+                                                                    0.5),
+                                                            fontWeight:
+                                                                FontWeight.w800,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                ],
                                               ),
                                             ),
-                                            const SizedBox(width: 15),
                                             SizedBox(
-                                              width: (size.width - 90) * 0.5,
-                                              child: Column(
+                                              width: (size.width - 40) * 0.3,
+                                              child: Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                    MainAxisAlignment.end,
                                                 children: [
                                                   Text(
-                                                    _dailyTransactions![index]
-                                                        .categoryName,
+                                                    'Rs. ${_dailyTransactions![index].amount}',
                                                     style: const TextStyle(
-                                                        fontSize: 15,
-                                                        color: black,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  const SizedBox(height: 5),
-                                                  Text(
-                                                    convertUtcToIst(
-                                                      _dailyTransactions![index]
-                                                          .expenseDate
-                                                          .toString(),
-                                                    ),
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color: black
-                                                          .withOpacity(0.5),
                                                       fontWeight:
-                                                          FontWeight.w800,
+                                                          FontWeight.w600,
+                                                      fontSize: 15,
+                                                      color: Colors.green,
                                                     ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
                                                   ),
                                                 ],
                                               ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      Container(
-                                        width: (size.width - 40) * 0.3,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              'Rs. ${_dailyTransactions![index].amount}',
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 15,
-                                                color: Colors.green,
-                                              ),
                                             ),
                                           ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 65, top: 8),
-                                    child: Divider(
-                                      thickness: 0.8,
+                                        const Padding(
+                                          padding:
+                                              EdgeInsets.only(left: 65, top: 8),
+                                          child: Divider(
+                                            thickness: 0.8,
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                  )
+                                  ),
+                                  if (_selectedContainerIndex == index)
+                                    GestureDetector(
+                                      onTap: () =>
+                                          _toggleOverlayVisibility(index),
+                                      child: AnimatedBuilder(
+                                        animation: _opacityAnimation,
+                                        builder: (context, child) {
+                                          return Opacity(
+                                            opacity: _opacityAnimation.value,
+                                            child: child,
+                                          );
+                                        },
+                                        child: IgnorePointer(
+                                          ignoring: !_isOverlayVisible,
+                                          child: Container(
+                                            color: Colors.black54,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 12.0),
+                                                  child: IconButton(
+                                                    onPressed: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return AlertDialog(
+                                                            actions: [
+                                                              TextButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop();
+                                                                  List<String>?
+                                                                      response =
+                                                                      await httpService
+                                                                          .deleteExpense(
+                                                                    _dailyTransactions![
+                                                                            index]
+                                                                        .expenseId,
+                                                                  );
+
+                                                                  if (response!
+                                                                          .length ==
+                                                                      2) {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                        content:
+                                                                            Text(
+                                                                          response[
+                                                                              1],
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                    fetchDailyTransactions();
+                                                                  } else {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      const SnackBar(
+                                                                        content:
+                                                                            Text(
+                                                                          "Something Went Wrong",
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                },
+                                                                child:
+                                                                    const Text(
+                                                                  'Ok',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .pink,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              TextButton(
+                                                                onPressed: () =>
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(),
+                                                                child:
+                                                                    const Text(
+                                                                  'Close',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .pink,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                            title: const Text(
+                                                              "Are you sure?",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black54,
+                                                              ),
+                                                            ),
+                                                            elevation: 1,
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.delete,
+                                                      size: 25,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 12.0),
+                                                  child: IconButton(
+                                                    onPressed: () async {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              EditExpensePage(
+                                                            expenseId:
+                                                                _dailyTransactions![
+                                                                        index]
+                                                                    .expenseId,
+                                                            expenseDate:
+                                                                _dailyTransactions![
+                                                                        index]
+                                                                    .expenseDate,
+                                                            expenseCategory:
+                                                                _dailyTransactions![
+                                                                        index]
+                                                                    .categoryName,
+                                                            expenseAmount:
+                                                                _dailyTransactions![
+                                                                        index]
+                                                                    .amount,
+                                                          ),
+                                                        ),
+                                                      );
+                                                      setState(() {
+                                                        fetchDailyTransactions();
+                                                      });
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.edit,
+                                                      size: 25,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
                                 ],
                               );
                             },

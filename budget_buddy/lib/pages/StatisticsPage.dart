@@ -103,21 +103,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
                       const SizedBox(
                         height: 25,
                       ),
-                      // CalendarTimeline(
-                      //   initialDate: _selectedDate,
-                      //   firstDate: DateTime(2020, 1, 1),
-                      //   lastDate: DateTime.now().add(const Duration(days: 6)),
-                      //   onDateSelected: (date) =>
-                      //       setState(() => _selectedDate = date),
-                      //   monthColor: const Color(0xff67727d),
-                      //   dayColor: const Color(0xff67727d),
-                      //   dayNameColor: const Color(0xFF333A47),
-                      //   activeDayColor: Colors.white,
-                      //   activeBackgroundDayColor: Colors.pink,
-                      //   dotsColor: const Color(0xffffffff),
-                      //   locale: 'en',
-                      //   shrink: true,
-                      // ),
                     ],
                   ),
                 ),
