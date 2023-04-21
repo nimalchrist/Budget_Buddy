@@ -17,9 +17,9 @@ void main() async {
         context: navigatorKey.currentContext!,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('No Internet Connection'),
-            content:
-                Text('Please check your internet connection and try again.'),
+            title: const Text('No Internet Connection'),
+            content: const Text(
+                'Please check your internet connection and try again.'),
             actions: <Widget>[
               TextButton(
                 child: const Text('OK'),

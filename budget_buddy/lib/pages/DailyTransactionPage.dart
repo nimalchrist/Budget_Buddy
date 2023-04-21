@@ -22,8 +22,8 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
   late DateTime _selectedDate;
   GlobalKey<_DailyTransactionPageState> dailyTransactionsPageKey =
       GlobalKey<_DailyTransactionPageState>();
-  int _selectedContainerIndex = -1;
 
+  int _selectedContainerIndex = -1;
   bool _isOverlayVisible = false;
   late AnimationController _animationController;
   late Animation<double> _opacityAnimation;
@@ -36,7 +36,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
     fetchDailyTransactions();
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
     );
     _opacityAnimation = Tween<double>(
       begin: 0.0,
@@ -48,6 +48,14 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: grey.withOpacity(0.05),
+      body: getBody(),
+    );
   }
 
   void _toggleOverlayVisibility(int index) {
@@ -65,8 +73,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
 
   void fetchDailyTransactions() async {
     late double amount = 0;
-    List<DailyTransactionModel> dailyTransactions =
-        await httpService.getDailyTransactions(
+    List<DailyTransactionModel> dailyTransactions = await httpService.getDailyTransactions(
       1000,
       '${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}',
     );
@@ -80,24 +87,15 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
     });
   }
 
-  String convertUtcToIst(String utcDateStr) {
+  String convertToTimeZone(String utcDateStr) {
     DateTime utcDate = DateTime.parse(utcDateStr);
     DateTime istDate = utcDate.add(const Duration(hours: 5, minutes: 30));
     String formattedDate = DateFormat('dd-MM-yyyy').format(istDate);
     return formattedDate;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: grey.withOpacity(0.05),
-      body: getBody(),
-    );
-  }
-
   Widget getBody() {
     var size = MediaQuery.of(context).size;
-    bool setBottomChild = false;
     return RefreshIndicator(
       edgeOffset: 140,
       color: Colors.pink,
@@ -146,6 +144,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                     const SizedBox(
                       height: 25,
                     ),
+                    // horizontal calendar
                     CalendarTimeline(
                       initialDate: _selectedDate,
                       firstDate: DateTime(2020, 1, 1),
@@ -204,8 +203,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                     child: Column(
                                       children: [
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             SizedBox(
                                               width: (size.width - 40) * 0.7,
@@ -216,61 +214,42 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                                     height: 50,
                                                     decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
-                                                      color:
-                                                          grey.withOpacity(0.1),
+                                                      color: grey.withOpacity(0.1),
                                                     ),
                                                     child: const Center(
                                                       child: Icon(
                                                         size: 30,
-                                                        Icons
-                                                            .currency_rupee_sharp,
+                                                        Icons.currency_rupee_sharp,
                                                       ),
                                                     ),
                                                   ),
                                                   const SizedBox(width: 15),
                                                   SizedBox(
-                                                    width:
-                                                        (size.width - 90) * 0.5,
+                                                    width: (size.width - 90) * 0.5,
                                                     child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Text(
-                                                          _dailyTransactions![
-                                                                  index]
-                                                              .categoryName,
+                                                          _dailyTransactions![index].categoryName,
                                                           style: const TextStyle(
                                                               fontSize: 15,
                                                               color: black,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                              fontWeight: FontWeight.w500),
+                                                          overflow: TextOverflow.ellipsis,
                                                         ),
-                                                        const SizedBox(
-                                                            height: 5),
+                                                        const SizedBox(height: 5),
                                                         Text(
-                                                          convertUtcToIst(
-                                                            _dailyTransactions![
-                                                                    index]
-                                                                .expenseDate
-                                                                .toString(),
-                                                          ),
+                                                          convertToTimeZone(
+                                                              _dailyTransactions![index]
+                                                                  .expenseDate
+                                                                  .toString()),
                                                           style: TextStyle(
                                                             fontSize: 12,
-                                                            color: black
-                                                                .withOpacity(
-                                                                    0.5),
-                                                            fontWeight:
-                                                                FontWeight.w800,
+                                                            color: black.withOpacity(0.5),
+                                                            fontWeight: FontWeight.w800,
                                                           ),
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
+                                                          overflow: TextOverflow.ellipsis,
                                                         ),
                                                       ],
                                                     ),
@@ -281,14 +260,12 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                             SizedBox(
                                               width: (size.width - 40) * 0.3,
                                               child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
+                                                mainAxisAlignment: MainAxisAlignment.end,
                                                 children: [
                                                   Text(
                                                     'Rs. ${_dailyTransactions![index].amount}',
                                                     style: const TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.w600,
+                                                      fontWeight: FontWeight.w600,
                                                       fontSize: 15,
                                                       color: Colors.green,
                                                     ),
@@ -298,9 +275,9 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                             ),
                                           ],
                                         ),
+                                        // divider
                                         const Padding(
-                                          padding:
-                                              EdgeInsets.only(left: 65, top: 8),
+                                          padding: EdgeInsets.only(left: 65, top: 8),
                                           child: Divider(
                                             thickness: 0.8,
                                           ),
@@ -310,8 +287,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                   ),
                                   if (_selectedContainerIndex == index)
                                     GestureDetector(
-                                      onTap: () =>
-                                          _toggleOverlayVisibility(index),
+                                      onTap: () => _toggleOverlayVisibility(index),
                                       child: AnimatedBuilder(
                                         animation: _opacityAnimation,
                                         builder: (context, child) {
@@ -323,15 +299,28 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                         child: IgnorePointer(
                                           ignoring: !_isOverlayVisible,
                                           child: Container(
-                                            color: Colors.black54,
+                                            padding: const EdgeInsets.all(3),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(8),
+                                              color: Colors.black54,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey.withOpacity(0.5),
+                                                  spreadRadius: 4,
+                                                  blurRadius: 8,
+                                                  offset: const Offset(
+                                                    0,
+                                                    3,
+                                                  ), // changes position of shadow
+                                                ),
+                                              ],
+                                            ),
                                             child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
+                                              mainAxisAlignment: MainAxisAlignment.end,
                                               children: [
+                                                // delete icon
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 12.0),
+                                                  padding: const EdgeInsets.only(top: 12.0),
                                                   child: IconButton(
                                                     onPressed: () {
                                                       showDialog(
@@ -340,88 +329,66 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                                           return AlertDialog(
                                                             actions: [
                                                               TextButton(
-                                                                onPressed:
-                                                                    () async {
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop();
-                                                                  List<String>?
-                                                                      response =
+                                                                onPressed: () async {
+                                                                  Navigator.of(context).pop();
+                                                                  List<String>? response =
                                                                       await httpService
                                                                           .deleteExpense(
-                                                                    _dailyTransactions![
-                                                                            index]
+                                                                    _dailyTransactions![index]
                                                                         .expenseId,
                                                                   );
-
-                                                                  if (response!
-                                                                          .length ==
-                                                                      2) {
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
+                                                                  _toggleOverlayVisibility(index);
+                                                                  if (response!.length == 2) {
+                                                                    ScaffoldMessenger.of(context)
                                                                         .showSnackBar(
                                                                       SnackBar(
-                                                                        content:
-                                                                            Text(
-                                                                          response[
-                                                                              1],
+                                                                        content: Text(
+                                                                          response[1],
                                                                         ),
                                                                       ),
                                                                     );
                                                                     fetchDailyTransactions();
                                                                   } else {
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
+                                                                    ScaffoldMessenger.of(context)
                                                                         .showSnackBar(
                                                                       const SnackBar(
-                                                                        content:
-                                                                            Text(
+                                                                        content: Text(
                                                                           "Something Went Wrong",
                                                                         ),
                                                                       ),
                                                                     );
                                                                   }
                                                                 },
-                                                                child:
-                                                                    const Text(
+                                                                child: const Text(
                                                                   'Ok',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .pink,
+                                                                  style: TextStyle(
+                                                                    color: Colors.pink,
                                                                   ),
                                                                 ),
                                                               ),
                                                               TextButton(
                                                                 onPressed: () =>
-                                                                    Navigator.of(
-                                                                            context)
-                                                                        .pop(),
-                                                                child:
-                                                                    const Text(
-                                                                  'Close',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .pink,
+                                                                    Navigator.of(context).pop(),
+                                                                child: const Text(
+                                                                  'Cancel',
+                                                                  style: TextStyle(
+                                                                    color: Colors.pink,
                                                                   ),
                                                                 ),
                                                               ),
                                                             ],
                                                             title: const Text(
-                                                              "Are you sure?",
+                                                              "Are you sure want to delete?",
                                                               style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .black54,
+                                                                fontWeight: FontWeight.bold,
+                                                                color: Colors.black54,
                                                               ),
                                                             ),
                                                             elevation: 1,
                                                           );
                                                         },
                                                       );
+                                                      _toggleOverlayVisibility(index);
                                                     },
                                                     icon: const Icon(
                                                       Icons.delete,
@@ -430,39 +397,31 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                                     ),
                                                   ),
                                                 ),
+                                                // edit icon
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 12.0),
+                                                  padding: const EdgeInsets.only(top: 12.0),
                                                   child: IconButton(
                                                     onPressed: () async {
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              EditExpensePage(
-                                                            expenseId:
-                                                                _dailyTransactions![
-                                                                        index]
-                                                                    .expenseId,
-                                                            expenseDate:
-                                                                _dailyTransactions![
-                                                                        index]
-                                                                    .expenseDate,
+                                                          builder: (context) => EditExpensePage(
+                                                            expenseId: _dailyTransactions![index]
+                                                                .expenseId,
+                                                            expenseDate: _dailyTransactions![index]
+                                                                .expenseDate,
                                                             expenseCategory:
-                                                                _dailyTransactions![
-                                                                        index]
+                                                                _dailyTransactions![index]
                                                                     .categoryName,
                                                             expenseAmount:
-                                                                _dailyTransactions![
-                                                                        index]
-                                                                    .amount,
+                                                                _dailyTransactions![index].amount,
                                                           ),
                                                         ),
                                                       );
                                                       setState(() {
                                                         fetchDailyTransactions();
                                                       });
+                                                      _toggleOverlayVisibility(index);
                                                     },
                                                     icon: const Icon(
                                                       Icons.edit,
@@ -476,7 +435,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                           ),
                                         ),
                                       ),
-                                    )
+                                    ),
                                 ],
                               );
                             },
