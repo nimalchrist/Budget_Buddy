@@ -6,11 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpService {
-  final String ip = "192.168.139.221";
+  final String ip = "192.168.103.221";
 
 // get all the posts
-  Future<List<DailyTransactionModel>> getDailyTransactions(
-      int userId, String date) async {
+  Future<List<DailyTransactionModel>> getDailyTransactions(int userId, String date) async {
     var url = Uri.parse('http://$ip:3000/$userId/$date');
     http.Response res = await http.get(url);
 
@@ -27,8 +26,7 @@ class HttpService {
     }
   }
 
-  Future<Map<String, dynamic>?> getMonthlyTotal(
-      int userId, int month, int year) async {
+  Future<Map<String, dynamic>?> getMonthlyTotal(int userId, int month, int year) async {
     var map = <String, dynamic>{};
     map["current_month"] = month.toString();
     map["current_year"] = year.toString();
@@ -48,8 +46,7 @@ class HttpService {
     }
   }
 
-  Future<dynamic> getCurrentMonthBalance(
-      int userId, int month, int year) async {
+  Future<dynamic> getCurrentMonthBalance(int userId, int month, int year) async {
     final url = Uri.parse('http://$ip:3000/balance/$userId');
     final response = await http.post(url, body: {
       'current_month': month.toString(),
@@ -64,8 +61,7 @@ class HttpService {
     }
   }
 
-  Future<List<String>> addExpense(
-      int userId, int categoryId, String amount, String date) async {
+  Future<List<String>> addExpense(int userId, int categoryId, String amount, String date) async {
     final url = Uri.parse('http://$ip:3000/$userId/addExpense');
     var map = <String, dynamic>{};
     map["category_id"] = categoryId.toString();
@@ -151,8 +147,7 @@ class HttpService {
     return null;
   }
 
-  Future<List<String>?> editExpense(
-      int expenseId, dynamic expenseAmount) async {
+  Future<List<String>?> editExpense(int expenseId, dynamic expenseAmount) async {
     final url = Uri.parse('http://$ip:3000/editExpense/$expenseId');
     var map = <String, dynamic>{};
     map["amount"] = expenseAmount;
@@ -166,53 +161,59 @@ class HttpService {
   }
 
   // register user
-  // Future<List<dynamic>> registerUser(
-  //     String username, String email, String password) async {
-  //   var map = Map<String, dynamic>();
-  //   map["username"] = username;
-  //   map["email"] = email;
-  //   map["password"] = password;
+  Future<List<dynamic>> registerUser(String username, String email, String password) async {
+    print("Method called");
+    var map = Map<String, dynamic>();
+    map["username"] = username;
+    map["email"] = email;
+    map["password"] = password;
 
-  //   var url = Uri.parse('http://$ip:8000/register');
-  //   http.Response res = await http.post(url, body: map);
-  //   var loginResponseData = jsonDecode(res.body);
+    var url = Uri.parse('http://$ip:3000/register');
+    http.Response res = await http.post(url, body: map);
+    var loginResponseData = jsonDecode(res.body);
 
-  //   String registerMessage = loginResponseData["message"];
-  //   try {
-  //     if (res.statusCode == 200) {
-  //       int authorisedUser = loginResponseData["user_id"];
+    String registerMessage = loginResponseData["msg"];
+    try {
+      if (res.statusCode == 200) {
+        int authorisedUser = loginResponseData["user_id"];
+        // local storage of the user.
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setInt('user_id', authorisedUser);
 
-  //       return [registerMessage, authorisedUser];
-  //     } else {
-  //       return [registerMessage];
-  //     }
-  //   } catch (e) {
-  //     return [e];
-  //   }
-  // }
+        return [registerMessage, authorisedUser];
+      } else {
+        return [registerMessage];
+      }
+    } catch (e) {
+      return [e];
+    }
+  }
 
   // login user
-  // Future<List<dynamic>> loginUser(String email, String password) async {
-  //   var map = Map<String, dynamic>();
-  //   map["email"] = email;
-  //   map["password"] = password;
+  Future<List<dynamic>> loginUser(String email, String password) async {
+    var map = Map<String, dynamic>();
+    map["email"] = email;
+    map["password"] = password;
 
-  //   var url = Uri.parse('http://$ip:8000/login');
-  //   http.Response res = await http.post(url, body: map);
-  //   var loginResponseData = jsonDecode(res.body);
+    var url = Uri.parse('http://$ip:3000/login');
+    http.Response res = await http.post(url, body: map);
+    var loginResponseData = jsonDecode(res.body);
 
-  //   String loginMessage = loginResponseData["message"];
-  //   try {
-  //     if (res.statusCode == 200) {
-  //       int authorisedUser = loginResponseData["user_id"];
-  //       return [loginMessage, authorisedUser];
-  //     } else {
-  //       return [loginMessage];
-  //     }
-  //   } catch (e) {
-  //     return [e];
-  //   }
-  // }
+    String loginMessage = loginResponseData["msg"];
+    try {
+      if (res.statusCode == 200) {
+        int authorisedUser = loginResponseData["user_id"];
+        // local storage of the user.
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setInt('user_id', authorisedUser);
+        return [loginMessage, authorisedUser];
+      } else {
+        return [loginMessage];
+      }
+    } catch (e) {
+      return [e];
+    }
+  }
 
 // otp verification
   // Future<List<dynamic>> otpVerification(String otp, int userId) async {

@@ -32,8 +32,15 @@ router.route("/:user_id/addExpense").post(controllers.addExpenseDaily);
 // to fetch for graph data
 router.route("/fetchGraphData/:user_id").post(controllers.fetchGraphData);
 
+// to check wether the budget is setted or not
 router.route("/budgets/:user_id/:month/:year").get(controllers.isBudgetSetted);
+
+// manipulation of expenses
 router.route("/editExpense/:expense_id").post(controllers.editExpense);
 router.route("/deleteExpense/:expense_id").post(controllers.deleteExpense);
+
+// login and register
+router.route("/login").post(controllers.loginUser);
+router.route("/register").post(controllers.registerUser);
 
 module.exports = router;

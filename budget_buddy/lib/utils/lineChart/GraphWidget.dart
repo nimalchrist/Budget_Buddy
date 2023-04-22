@@ -3,16 +3,21 @@ import 'package:budget_buddy/models/GraphDataModel.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ExpenseLineChart extends StatefulWidget {
+  final int authorisedUser;
+  ExpenseLineChart({Key? key, required this.authorisedUser});
   @override
-  State<ExpenseLineChart> createState() => ExpenseLineChartState();
+  State<ExpenseLineChart> createState() => ExpenseLineChartState(userId: authorisedUser);
 }
 
 class ExpenseLineChartState extends State<ExpenseLineChart> {
   List<GraphDataModel>? _graphData;
-  final int userId = 1000;
+  final int userId;
   HttpService httpService = HttpService();
+  ExpenseLineChartState({required this.userId});
+
   void fetchGraphData() async {
     List<GraphDataModel>? graphData = await httpService.fetchGraphData(userId);
     setState(() {

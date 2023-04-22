@@ -1,51 +1,29 @@
+import 'package:budget_buddy/pages/LoginPage.dart';
 import 'package:budget_buddy/services/NotificationService.dart';
 import 'package:flutter/material.dart';
-import 'package:connectivity/connectivity.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import './pages/RootApp.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Check for internet connectivity
-  var connectivityResult = await Connectivity().checkConnectivity();
-  if (connectivityResult != ConnectivityResult.none) {
-    await NotificationService().initNotifications();
-  } else {
-    // Show error message
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDialog(
-        context: navigatorKey.currentContext!,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('No Internet Connection'),
-            content: const Text(
-                'Please check your internet connection and try again.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    });
-  }
-
   runApp(const MyApp());
 }
-// import 'package:budget_buddy/pages/RootApp.dart';
-// import 'package:flutter/material.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-// void main(List<String> args) {
-//   runApp(const MyApp());
-// }
+void setupApp(int userId) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService(userId: userId)
+      .initNotifications(); // or any other services that you need to initialize
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  Future<int?> get checkLogined async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? userId = prefs.getInt("user_id");
+    if (userId == null) {
+      return 0;
+    }
+    return userId;
+  }
 
   // This widget is the root of your application.
   @override
@@ -53,119 +31,41 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Budget buddy',
-      navigatorKey: navigatorKey,
-      home: const RootApp(),
+      home: FutureBuilder(
+        future: checkLogined,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data != 0) {
+              dynamic userId = snapshot.data;
+              setupApp(userId);
+              return RootApp(authorisedUser: userId);
+            } else {
+              return const LoginPage();
+            }
+          }
+          if (snapshot.hasError) {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Color.fromARGB(255, 31, 21, 87),
+                ),
+              ),
+            );
+          }
+          return const Scaffold(
+            body: Center(
+              child: Text(
+                "Loading...",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.pink,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
-
-// class MyContainer extends StatefulWidget {
-//   @override
-//   _MyContainerState createState() => _MyContainerState();
-// }
-
-// class _MyContainerState extends State<MyContainer>
-//     with SingleTickerProviderStateMixin {
-//   bool _isOverlayVisible = false;
-//   late AnimationController _animationController;
-//   late Animation<double> _opacityAnimation;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _animationController = AnimationController(
-//       vsync: this,
-//       duration: Duration(milliseconds: 300),
-//     );
-//     _opacityAnimation = Tween<double>(
-//       begin: 0.0,
-//       end: 1.0,
-//     ).animate(_animationController);
-//   }
-
-//   @override
-//   void dispose() {
-//     _animationController.dispose();
-//     super.dispose();
-//   }
-
-//   void _toggleOverlayVisibility() {
-//     setState(() {
-//       _isOverlayVisible = !_isOverlayVisible;
-//     });
-//     if (_isOverlayVisible) {
-//       _animationController.forward();
-//     } else {
-//       _animationController.reverse();
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return SafeArea(
-//       child: Scaffold(
-//         body: GestureDetector(
-//           onTap: _toggleOverlayVisibility,
-//           child: Stack(
-//             children: [
-//               Container(
-//                 width: 200,
-//                 height: 200,
-//                 color: Colors.blue,
-//                 child: Center(
-//                   child: Text(
-//                     "Tap me",
-//                     style: TextStyle(
-//                       color: Colors.white,
-//                       fontSize: 20,
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//               AnimatedBuilder(
-//                 animation: _opacityAnimation,
-//                 builder: (context, child) {
-//                   return Opacity(
-//                     opacity: _opacityAnimation.value,
-//                     child: child,
-//                   );
-//                 },
-//                 child: IgnorePointer(
-//                   ignoring: !_isOverlayVisible,
-//                   child: Container(
-//                     width: 200,
-//                     height: 200,
-//                     color: Colors.black54,
-//                     child: Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                       children: [
-//                         IconButton(
-//                           icon: Icon(
-//                             Icons.edit,
-//                             color: Colors.white,
-//                           ),
-//                           onPressed: () {
-//                             print("Edit button pressed");
-//                           },
-//                         ),
-//                         IconButton(
-//                           icon: Icon(
-//                             Icons.delete,
-//                             color: Colors.white,
-//                           ),
-//                           onPressed: () {
-//                             print("Delete button pressed");
-//                           },
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

@@ -1,5 +1,4 @@
 import 'package:budget_buddy/pages/editExpensePage.dart';
-
 import '../theme/Colors.dart';
 import 'package:flutter/material.dart';
 import '../http_Operations/httpServices.dart';
@@ -8,12 +7,15 @@ import 'package:intl/intl.dart';
 import '../utils/calendar_utils/calendar_timeline.dart';
 
 class DailyTransactionPage extends StatefulWidget {
+  final int authorisedUser;
+  const DailyTransactionPage({Key? key, required this.authorisedUser});
   @override
-  _DailyTransactionPageState createState() => _DailyTransactionPageState();
+  _DailyTransactionPageState createState() => _DailyTransactionPageState(userId: authorisedUser);
 }
 
 class _DailyTransactionPageState extends State<DailyTransactionPage>
     with SingleTickerProviderStateMixin {
+  final int userId;
   HttpService httpService = HttpService();
   List<DailyTransactionModel>? _dailyTransactions;
   DateTime currentdate = DateTime.now();
@@ -28,6 +30,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
   late AnimationController _animationController;
   late Animation<double> _opacityAnimation;
 
+  _DailyTransactionPageState({required this.userId});
   @override
   void initState() {
     super.initState();
@@ -74,7 +77,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
   void fetchDailyTransactions() async {
     late double amount = 0;
     List<DailyTransactionModel> dailyTransactions = await httpService.getDailyTransactions(
-      1000,
+      userId,
       '${_selectedDate.year}-${_selectedDate.month}-${_selectedDate.day}',
     );
 
@@ -241,9 +244,10 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                                                         const SizedBox(height: 5),
                                                         Text(
                                                           convertToTimeZone(
-                                                              _dailyTransactions![index]
-                                                                  .expenseDate
-                                                                  .toString()),
+                                                            _dailyTransactions![index]
+                                                                .expenseDate
+                                                                .toString(),
+                                                          ),
                                                           style: TextStyle(
                                                             fontSize: 12,
                                                             color: black.withOpacity(0.5),

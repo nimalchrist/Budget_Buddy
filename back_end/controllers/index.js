@@ -204,3 +204,67 @@ exports.deleteExpense = (req, res) => {
     res.status(200).json({ msg: "Deleted successfully" });
   });
 };
+
+exports.loginUser = (req, res) => {
+  const { email, password } = req.body;
+  selectString = "select email, password from users where email = ?";
+  conn.query(selectString, email, function (err, results) {
+    if (err) {
+      return res.status(500).json({ msg: "Error with the server" });
+    }
+    if (results.length == 0) {
+      return res.status(404).json({ msg: "Invalid Login Credentials" });
+    } else {
+      let checkPass = results[0].password;
+      let confirmationString = "Select user_id from users where email = ?";
+      if (password == checkPass) {
+        conn.query(confirmationString, email, function (error, result) {
+          if (err) {
+            return res.status(500).json({ msg: "Error with the server" });
+          }
+          res.status(200).json({
+            msg: "Login successfull",
+            user_id: result[0].user_id,
+          });
+        });
+      } else {
+        res.status(404).json({ msg: "Sorry wrong password" });
+      }
+    }
+  });
+};
+
+exports.registerUser = (req, res) => {
+  const { username, email, password } = req.body;
+  values = [username, email, password];
+
+  const selectString = "Select email from users where email = ?";
+  conn.query(selectString, email, function (err, results) {
+    if (err) {
+      return res.status(500).json({ msg: "Error with the server" });
+    }
+    if (results.length != 0) {
+      return res
+        .status(404)
+        .json({ msg: "Email Already Exist, Enter a new Email" });
+    } else {
+      const insertString =
+        "Insert into users(user_name, email, password) values(?)";
+      conn.query(insertString, [values], function (err, results) {
+        if (err) {
+          return res.status(500).json({ msg: "Error with the server" });
+        }
+        const idQueryString = "Select user_id from users where email = ?";
+        conn.query(idQueryString, email, function (err, results) {
+          if (err) {
+            return res.status(500).json({ msg: "Error with the server" });
+          }
+          return res.status(200).json({
+            msg: "Registered successfully",
+            user_id: results[0].user_id,
+          });
+        });
+      });
+    }
+  });
+};

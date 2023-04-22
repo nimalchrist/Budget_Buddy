@@ -43,9 +43,11 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
+  final int userId;
   static HttpService httpService = HttpService();
-  final FlutterLocalNotificationsPlugin _notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+
+  NotificationService({required this.userId});
+  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> initNotifications() async {
     print("Method called");
@@ -57,9 +59,10 @@ class NotificationService {
     await _notificationsPlugin.initialize(initializationSettings);
 
     // Schedule notifications if the budget is not set
-    bool? budgetSet = await httpService.isButgetSetted(1000);
+    bool? budgetSet = await httpService.isButgetSetted(userId);
     if (budgetSet != null) {
       if (!budgetSet) {
+        print("Method called for send notifications");
         _scheduleNotifications();
       }
     }
@@ -73,8 +76,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
     );
-    var platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
 
     await _notificationsPlugin.periodicallyShow(
       0,
@@ -99,8 +101,7 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
     );
-    var platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
+    var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
     await _notificationsPlugin.show(
       id,
       title,

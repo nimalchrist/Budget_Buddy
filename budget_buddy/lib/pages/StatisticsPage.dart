@@ -4,29 +4,31 @@ import '../http_Operations/httpServices.dart';
 import '../utils/lineChart/GraphWidget.dart';
 
 class StatisticsPage extends StatefulWidget {
+  final int authorisedUser;
+  StatisticsPage({Key? key, required this.authorisedUser});
   @override
-  _StatisticsPageState createState() => _StatisticsPageState();
+  _StatisticsPageState createState() => _StatisticsPageState(userId: authorisedUser);
 }
 
 class _StatisticsPageState extends State<StatisticsPage> {
   late DateTime _selectedDate;
   final HttpService _httpService = HttpService();
-  late int _userId;
+  late int userId;
   Map<String, dynamic>? _results;
   dynamic _balance;
 
+  _StatisticsPageState({required this.userId});
   @override
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
-    _userId = 1000;
     fetchTotalStats();
     fetchMonthlyBalance();
   }
 
   void fetchTotalStats() async {
     Map<String, dynamic>? results = await _httpService.getMonthlyTotal(
-      _userId,
+      userId,
       _selectedDate.month,
       _selectedDate.year,
     );
@@ -37,7 +39,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   void fetchMonthlyBalance() async {
     dynamic balance = await _httpService.getCurrentMonthBalance(
-      _userId,
+      userId,
       _selectedDate.month,
       _selectedDate.year,
     );
@@ -167,6 +169,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             ],
                           ),
                         ),
+                        // graph data
                         Positioned(
                           bottom: 0,
                           child: SizedBox(
@@ -174,7 +177,9 @@ class _StatisticsPageState extends State<StatisticsPage> {
                             height: 150,
                             child: SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
-                              child: ExpenseLineChart(),
+                              child: ExpenseLineChart(
+                                authorisedUser: userId,
+                              ),
                             ),
                           ),
                         )

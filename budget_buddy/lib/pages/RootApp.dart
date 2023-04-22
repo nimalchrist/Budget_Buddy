@@ -5,22 +5,38 @@ import 'package:budget_buddy/pages/ProfilePage.dart';
 import 'package:budget_buddy/pages/StatisticsPage.dart';
 import 'package:flutter/material.dart';
 import '../theme/Colors.dart';
+import '../utils/bottomBarCusomised/PopOver.dart';
 
 class RootApp extends StatefulWidget {
-  const RootApp({super.key});
+  final int authorisedUser;
+  const RootApp({super.key, required this.authorisedUser});
 
   @override
-  State<RootApp> createState() => _RootAppState();
+  State<RootApp> createState() => _RootAppState(userId: authorisedUser);
 }
 
 class _RootAppState extends State<RootApp> {
   int pageIndex = 0;
-  List<Widget> pages = [
-    DailyTransactionPage(),
-    StatisticsPage(),
-    const IncomePage(),
-    ProfilePage(),
-  ];
+  final int userId;
+  _RootAppState({required this.userId});
+  late List<Widget> pages;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    pages = [
+      DailyTransactionPage(
+        authorisedUser: userId,
+      ),
+      StatisticsPage(
+        authorisedUser: userId,
+      ),
+      const IncomePage(),
+      ProfilePage(),
+    ];
+  }
+
   void refreshPages() {
     setState(() {
       pageIndex = 0;
@@ -34,58 +50,59 @@ class _RootAppState extends State<RootApp> {
       bottomNavigationBar: getFooter(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showDialog(
+          showModalBottomSheet<int>(
+            backgroundColor: Colors.transparent,
             context: context,
             builder: (context) {
-              return AlertDialog(
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text(
-                      'Close',
-                      style: TextStyle(
+              return PopOver(
+                child: Column(
+                  children: [
+                    _buildListItem(
+                      context,
+                      title: TextButton(
+                        child: const Text(
+                          'Set Budget',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {},
+                      ),
+                      leading: const Icon(
+                        Icons.attach_money,
                         color: Colors.pink,
                       ),
                     ),
-                  ),
-                ],
-                title: const Text(
-                  "What do you want to do?",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54,
-                  ),
-                ),
-                elevation: 1,
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.pink),
-                      ),
-                      onPressed: () {},
-                      child: const Text("Set Budget"),
-                    ),
-                    ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.pink),
-                      ),
-                      onPressed: () {
-                        // Handle "Add Expense" option
-                        Navigator.of(context).pop();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddExpensePage(
-                              refreshCallback: refreshPages,
-                            ),
+                    _buildListItem(
+                      context,
+                      title: TextButton(
+                        child: const Text(
+                          'Add Expense',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                        );
-                      },
-                      child: const Text("Add Expense"),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddExpensePage(
+                                refreshCallback: refreshPages,
+                                authorisedUser: userId,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      leading: const Icon(
+                        Icons.add,
+                        color: Colors.pink,
+                      ),
                     ),
                   ],
                 ),
@@ -133,6 +150,47 @@ class _RootAppState extends State<RootApp> {
         selectedTab(index);
       },
       //other params
+    );
+  }
+
+  Widget _buildListItem(
+    BuildContext context, {
+    required Widget title,
+    required Widget leading,
+  }) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 24.0,
+        vertical: 16.0,
+      ),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: theme.dividerColor,
+            width: 0.5,
+          ),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          if (leading != null) leading,
+          if (title != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+              ),
+              child: DefaultTextStyle(
+                child: title,
+                // ignore: deprecated_member_use
+                style: theme.textTheme.headline6 as TextStyle,
+              ),
+            ),
+          const Spacer(),
+        ],
+      ),
     );
   }
 

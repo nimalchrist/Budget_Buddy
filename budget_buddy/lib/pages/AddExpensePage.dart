@@ -1,25 +1,27 @@
 import 'package:budget_buddy/models/CategoryModel.dart';
 import 'package:intl/intl.dart';
-
 import '../http_Operations/httpServices.dart';
 import '../theme/Colors.dart';
 import 'package:flutter/material.dart';
 
 class AddExpensePage extends StatefulWidget {
   final Function refreshCallback;
-  const AddExpensePage({Key? key, required this.refreshCallback})
+  final int authorisedUser;
+  const AddExpensePage({Key? key, required this.refreshCallback, required this.authorisedUser})
       : super(key: key);
   @override
-  _AddExpensePageState createState() => _AddExpensePageState();
+  _AddExpensePageState createState() => _AddExpensePageState(userId: this.authorisedUser);
 }
 
 class _AddExpensePageState extends State<AddExpensePage> {
   int activeCategory = 0;
+  final int userId;
   HttpService httpService = HttpService();
   final TextEditingController _expenseAmount = TextEditingController(text: '0');
   List<CategoryModel>? _categories;
   String? _selectedDate;
-  int userId = 1000;
+
+  _AddExpensePageState({required this.userId});
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
@@ -89,8 +91,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.only(
-                  top: 60, right: 20, left: 20, bottom: 25),
+              padding: const EdgeInsets.only(top: 60, right: 20, left: 20, bottom: 25),
               child: Column(
                 children: [
                   Row(
@@ -152,9 +153,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 color: white,
                                 border: Border.all(
                                   width: 2,
-                                  color: activeCategory == index
-                                      ? primary
-                                      : Colors.transparent,
+                                  color: activeCategory == index ? primary : Colors.transparent,
                                 ),
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
@@ -175,8 +174,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
                                       width: 60,
@@ -231,8 +229,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     _selectDate(context);
                   },
                   style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.pink),
+                    backgroundColor: MaterialStateProperty.all<Color>(Colors.pink),
                   ),
                   child: const Text(
                     'Select Date',
@@ -321,8 +318,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         onPressed: () async {
                           if (_selectedDate != null) {
                             // api call
-                            List<dynamic> responses =
-                                await httpService.addExpense(
+                            List<dynamic> responses = await httpService.addExpense(
                               userId,
                               activeCategory + 1,
                               _expenseAmount.text,
