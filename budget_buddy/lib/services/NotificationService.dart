@@ -50,7 +50,7 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> initNotifications() async {
-    print("Method called");
+    print("Notification service initialized");
     tz.initializeTimeZones();
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('ic_launcher');
@@ -62,7 +62,7 @@ class NotificationService {
     bool? budgetSet = await httpService.isButgetSetted(userId);
     if (budgetSet != null) {
       if (!budgetSet) {
-        print("Method called for send notifications");
+        print("Notifications are scheduled");
         _scheduleNotifications();
       }
     }

@@ -97,6 +97,9 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   child: TextFormField(
                     controller: mailId,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Email can't be empty";
@@ -119,6 +122,9 @@ class _LoginPageState extends State<LoginPage> {
                         child: TextFormField(
                           controller: passWord,
                           obscureText: true,
+                          onChanged: (value) {
+                            setState(() {});
+                          },
                           autocorrect: false,
                           enableSuggestions: false,
                           validator: (value) {
@@ -137,7 +143,9 @@ class _LoginPageState extends State<LoginPage> {
                         width: 48, // Set the width of the container
                         height: 48,
                         decoration: BoxDecoration(
-                          color: Colors.pink, // Set the background color of the container
+                          color: mailId!.text.isNotEmpty && passWord!.text.isNotEmpty
+                              ? Colors.pink
+                              : Colors.grey[200], // Set the background color of the container
                           borderRadius:
                               BorderRadius.circular(8), // Set the border radius of the container
                         ),
@@ -171,9 +179,11 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             }
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_forward_ios,
-                            color: Colors.white,
+                            color: mailId!.text.isNotEmpty && passWord!.text.isNotEmpty
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ),

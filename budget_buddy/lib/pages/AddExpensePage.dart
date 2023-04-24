@@ -17,9 +17,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
   int activeCategory = 0;
   final int userId;
   HttpService httpService = HttpService();
-  final TextEditingController _expenseAmount = TextEditingController(text: '0');
+  final TextEditingController _expenseAmount = TextEditingController();
   List<CategoryModel>? _categories;
   String? _selectedDate;
+  final _formKey = GlobalKey<FormState>();
 
   _AddExpensePageState({required this.userId});
 
@@ -219,6 +220,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
           const SizedBox(
             height: 50,
           ),
+
           Padding(
             padding: const EdgeInsets.only(left: 20, right: 20),
             child: Column(
@@ -257,49 +259,68 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         ),
                       ),
                 const SizedBox(
-                  height: 60,
+                  height: 30,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SizedBox(
-                      width: (size.width - 140),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Enter Amount",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18,
-                              color: Color(0xff67727d),
-                            ),
-                          ),
-                          TextFormField(
-                            keyboardType: TextInputType.number,
-                            controller: _expenseAmount,
-                            cursorColor: black,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: black,
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Name is required';
-                              }
-                              return null;
-                            },
-                            decoration: const InputDecoration(
-                              hintText: "Eg. 120",
-                              hintStyle: TextStyle(
-                                fontSize: 18,
-                                color: Colors.black38,
+                    Form(
+                      key: _formKey,
+                      child: SizedBox(
+                        width: (size.width - 140),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                              decoration: const BoxDecoration(
+                                color: Colors.pink,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(4),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color.fromRGBO(0, 0, 0, 0.2),
+                                    offset: Offset(0, 2), // Set the offset of the shadow
+                                    blurRadius: 2, // Set the blur radius of the shadow
+                                  ),
+                                ],
                               ),
-                              border: InputBorder.none,
+                              child: const Text(
+                                "Enter Amount",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            TextFormField(
+                              keyboardType: TextInputType.number,
+                              controller: _expenseAmount,
+                              cursorColor: black,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: black,
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Amount is required';
+                                }
+                                return null;
+                              },
+                              decoration: const InputDecoration(
+                                hintText: "Eg. 120",
+                                hintStyle: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black38,
+                                ),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(
@@ -316,7 +337,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         icon: const Icon(Icons.arrow_forward),
                         color: white,
                         onPressed: () async {
-                          if (_selectedDate != null) {
+                          if (_selectedDate != null && _formKey.currentState!.validate()) {
                             // api call
                             List<dynamic> responses = await httpService.addExpense(
                               userId,

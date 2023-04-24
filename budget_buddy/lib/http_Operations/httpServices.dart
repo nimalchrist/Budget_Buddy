@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'package:budget_buddy/main.dart';
 import 'package:budget_buddy/models/CategoryModel.dart';
 import 'package:budget_buddy/models/DailyTransactionModel.dart';
 import 'package:budget_buddy/models/GraphDataModel.dart';
+import 'package:budget_buddy/models/ProfileInfoModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -212,6 +214,40 @@ class HttpService {
       }
     } catch (e) {
       return [e];
+    }
+  }
+
+  Future<dynamic> getBudgetAmount(int userId) async {
+    int month = DateTime.now().month;
+    int year = DateTime.now().year;
+
+    var map = Map<String, dynamic>();
+    map["current_month"] = month.toString();
+    map["current_year"] = year.toString();
+
+    var url = Uri.parse('http://$ip:3000/budget/$userId');
+    http.Response res = await http.post(url, body: map);
+    dynamic rawData = jsonDecode(res.body);
+    if (res.statusCode == 200) {
+      int? budget = rawData['budget'];
+      return budget;
+    } else {
+      return null;
+    }
+  }
+
+  Future<ProfileInfoModel?> getProfileInfo(int userId) async {
+    var url = Uri.parse('http://$ip:3000/profileInfo/$userId');
+    http.Response res = await http.post(url);
+
+    if (res.statusCode == 200) {
+      dynamic rawData = jsonDecode(res.body);
+      Map<String, dynamic> data = rawData[0];
+      ProfileInfoModel profileInfo = ProfileInfoModel.fromJson(data);
+
+      return profileInfo;
+    } else {
+      return null;
     }
   }
 

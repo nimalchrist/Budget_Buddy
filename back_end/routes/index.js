@@ -38,6 +38,8 @@ router.route("/budgets/:user_id/:month/:year").get(controllers.isBudgetSetted);
 // manipulation of expenses
 router.route("/editExpense/:expense_id").post(controllers.editExpense);
 router.route("/deleteExpense/:expense_id").post(controllers.deleteExpense);
+router.route("/budget/:user_id").post(controllers.getBudgetAmount);
+router.route("/profileInfo/:user_id").post(controllers.getProfileInfo);
 
 // login and register
 router.route("/login").post(controllers.loginUser);

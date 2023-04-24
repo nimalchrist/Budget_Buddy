@@ -98,6 +98,9 @@ class _SignupState extends State<Signup> {
                   padding: const EdgeInsets.only(left: 24.0, right: 24, top: 8, bottom: 16),
                   child: TextFormField(
                     controller: mailId,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
                     validator: (value) {
                       if (value!.isEmpty) {
                         return "Email can't be empty";
@@ -119,6 +122,9 @@ class _SignupState extends State<Signup> {
                       Expanded(
                         child: TextFormField(
                           controller: passWord,
+                          onChanged: (value) {
+                            setState(() {});
+                          },
                           validator: (value) {
                             if (value!.isEmpty) {
                               return "Password can't be empty";
@@ -137,7 +143,11 @@ class _SignupState extends State<Signup> {
                         width: 48, // Set the width of the container
                         height: 48,
                         decoration: BoxDecoration(
-                          color: Colors.grey[200], // Set the background color of the container
+                          color: userName.text.isNotEmpty &&
+                                  mailId.text.isNotEmpty &&
+                                  passWord.text.isNotEmpty
+                              ? Colors.pink
+                              : Colors.grey[200], // Set the background color of the container
                           borderRadius:
                               BorderRadius.circular(8), // Set the border radius of the container
                         ),
@@ -176,9 +186,13 @@ class _SignupState extends State<Signup> {
                               }
                             }
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_forward_ios,
-                            color: Colors.white,
+                            color: userName.text.isNotEmpty &&
+                                    mailId.text.isNotEmpty &&
+                                    passWord.text.isNotEmpty
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ),

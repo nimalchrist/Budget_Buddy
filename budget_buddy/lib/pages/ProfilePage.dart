@@ -1,18 +1,63 @@
+import 'package:budget_buddy/models/ProfileInfoModel.dart';
+import 'package:budget_buddy/pages/SetBudgetPage.dart';
+import 'package:intl/intl.dart';
+
 import '../theme/Colors.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
+import '../http_Operations/httpServices.dart';
 
 class ProfilePage extends StatefulWidget {
+  final int authorisedUser;
+
+  ProfilePage({Key? key, required this.authorisedUser});
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _ProfilePageState createState() => _ProfilePageState(userId: this.authorisedUser);
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final TextEditingController _email =
-      TextEditingController(text: "chiristonimal@gmail.com");
-  TextEditingController dateOfBirth = TextEditingController(text: "13-09-2002");
-  TextEditingController password = TextEditingController(text: "123456");
-  bool isSet = false;
+  late HttpService httpService;
+  final int userId;
+  ProfileInfoModel? _profileInfo;
+  _ProfilePageState({required this.userId});
+  int? _budget;
+
+  // void isButgetSetted() async {
+  //   bool? isSet = await httpService.isButgetSetted(userId);
+  //   setState(() {
+  //   });
+  // }
+
+  void fetchBudget() async {
+    int? budget = await httpService.getBudgetAmount(userId);
+    setState(() {
+      _budget = budget;
+    });
+  }
+
+  void fetchProfileInfo() async {
+    ProfileInfoModel? profileInfo = await httpService.getProfileInfo(userId);
+    setState(() {
+      _profileInfo = profileInfo;
+    });
+  }
+
+  String timeFormatter(DateTime dateTime) {
+    return DateFormat('MMM d, y').format(
+      dateTime.add(
+        const Duration(hours: 5, minutes: 30),
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    httpService = HttpService();
+    // isButgetSetted();
+    fetchBudget();
+    fetchProfileInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(
                     height: 25,
                   ),
+                  // profile info pic and email
                   Row(
                     children: [
                       SizedBox(
@@ -78,8 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                image: NetworkImage(
-                                    "https://images.unsplash.com/photo-1531256456869-ce942a665e80?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTI4fHxwcm9maWxlfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60"),
+                                image: AssetImage('assets/images/author.png'),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -91,9 +136,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Abbie Wilson",
-                              style: TextStyle(
+                            Text(
+                              _profileInfo != null ? "@${_profileInfo!.userName}" : "Default User",
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: black,
@@ -103,7 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               height: 10,
                             ),
                             Text(
-                              "chiristonimal@gmail.com",
+                              _profileInfo != null ? _profileInfo!.email : "Default Email",
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -118,78 +163,85 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(
                     height: 25,
                   ),
-                  isSet != true
-                      ? Container(
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: primary,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: primary.withOpacity(0.01),
-                                spreadRadius: 10,
-                                blurRadius: 3,
-                                // changes position of shadow
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: primary,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primary.withOpacity(0.01),
+                          spreadRadius: 10,
+                          blurRadius: 3,
+                          // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20,
+                        right: 20,
+                        top: 25,
+                        bottom: 25,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Monthly budget",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12,
+                                  color: white,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                _budget != null ? "$_budget.0" : "Rs.0.0",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                  color: white,
+                                ),
                               ),
                             ],
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 20,
-                              right: 20,
-                              top: 25,
-                              bottom: 25,
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: white),
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: const [
-                                    Text(
-                                      "Set Monthly budget",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 12,
-                                          color: white),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SetBudgetPage(
+                                      authorisedUser: userId,
                                     ),
-                                    SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      "Rs. 0.0",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                          color: white),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: white),
                                   ),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        isSet = true;
-                                      });
-                                    },
-                                    child: const Padding(
+                                );
+                              },
+                              child: _budget == null
+                                  ? const Padding(
                                       padding: EdgeInsets.all(13.0),
                                       child: Text(
                                         "Set now",
                                         style: TextStyle(color: white),
                                       ),
-                                    ),
-                                  ),
-                                )
-                              ],
+                                    )
+                                  : const SizedBox(),
                             ),
-                          ),
-                        )
-                      : const SizedBox()
+                          )
+                        ],
+                      ),
+                    ),
+                  )
                 ],
               ),
             ),
@@ -197,83 +249,83 @@ class _ProfilePageState extends State<ProfilePage> {
           const SizedBox(
             height: 50,
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Email",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13,
-                      color: Color(0xff67727d)),
-                ),
-                TextField(
-                  controller: _email,
-                  cursorColor: black,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: black,
+          _profileInfo != null
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "User Name",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Color(0xff67727d),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "@${_profileInfo!.userName}",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: black,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      const Text(
+                        "Email",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Color(0xff67727d),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          _profileInfo!.email,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: black,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      const Text(
+                        "Member Since",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                          color: Color(0xff67727d),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          timeFormatter(_profileInfo!.registeredAt),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: black,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  decoration: const InputDecoration(
-                    hintText: "Email",
-                    border: InputBorder.none,
+                )
+              : const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.pink,
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const Text(
-                  "Date of birth",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                    color: Color(0xff67727d),
-                  ),
-                ),
-                TextField(
-                  controller: dateOfBirth,
-                  cursorColor: black,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: black,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: "Date of birth",
-                    border: InputBorder.none,
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const Text(
-                  "Date of birth",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                    color: Color(0xff67727d),
-                  ),
-                ),
-                TextField(
-                  obscureText: true,
-                  controller: password,
-                  cursorColor: black,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: black,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: "Password",
-                    border: InputBorder.none,
-                  ),
-                ),
-              ],
-            ),
-          )
         ],
       ),
     );

@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:budget_buddy/pages/AddExpensePage.dart';
 import 'package:budget_buddy/pages/DailyTransactionPage.dart';
 import 'package:budget_buddy/pages/ProfilePage.dart';
+import 'package:budget_buddy/pages/SetBudgetPage.dart';
 import 'package:budget_buddy/pages/StatisticsPage.dart';
 import 'package:flutter/material.dart';
 import '../theme/Colors.dart';
@@ -33,7 +36,9 @@ class _RootAppState extends State<RootApp> {
         authorisedUser: userId,
       ),
       const IncomePage(),
-      ProfilePage(),
+      ProfilePage(
+        authorisedUser: userId,
+      ),
     ];
   }
 
@@ -64,11 +69,22 @@ class _RootAppState extends State<RootApp> {
                           'Set Budget',
                           style: TextStyle(
                             color: Colors.black54,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SetBudgetPage(
+                                authorisedUser: userId,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       leading: const Icon(
                         Icons.attach_money,
@@ -82,7 +98,7 @@ class _RootAppState extends State<RootApp> {
                           'Add Expense',
                           style: TextStyle(
                             color: Colors.black54,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -101,6 +117,24 @@ class _RootAppState extends State<RootApp> {
                       ),
                       leading: const Icon(
                         Icons.add,
+                        color: Colors.pink,
+                      ),
+                    ),
+                    _buildListItem(
+                      context,
+                      title: TextButton(
+                        child: const Text(
+                          'Add Categories',
+                          style: TextStyle(
+                            color: Colors.black54,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {},
+                      ),
+                      leading: const Icon(
+                        Icons.category,
                         color: Colors.pink,
                       ),
                     ),
@@ -176,6 +210,7 @@ class _RootAppState extends State<RootApp> {
       child: Row(
         mainAxisSize: MainAxisSize.max,
         children: [
+          // ignore: unnecessary_null_comparison
           if (leading != null) leading,
           if (title != null)
             Padding(
@@ -183,9 +218,8 @@ class _RootAppState extends State<RootApp> {
                 horizontal: 16.0,
               ),
               child: DefaultTextStyle(
-                child: title,
-                // ignore: deprecated_member_use
                 style: theme.textTheme.headline6 as TextStyle,
+                child: title,
               ),
             ),
           const Spacer(),

@@ -205,6 +205,42 @@ exports.deleteExpense = (req, res) => {
   });
 };
 
+exports.getBudgetAmount = (req, res) => {
+  let userId = req.params.user_id;
+  let month = req.body.current_month;
+  let year = req.body.current_year;
+  let values = [userId, month, year];
+  const queryString =
+    "SELECT amount as budget FROM budgets WHERE user_id = ? AND MONTH(income_date) = ? AND YEAR(income_date) = ?";
+  conn.query(queryString, values, function (err, results) {
+    if (err) {
+      return res.status(500).json({ error: "Error fetching from database" });
+    } else {
+      const budget = results[0];
+      if (budget == null) {
+        return res.status(200).json({ budget: null });
+      }
+      return res.status(200).json(budget);
+    }
+  });
+};
+
+exports.getProfileInfo = (req, res) => {
+  let userId = req.params.user_id;
+
+  let queryString = `select user_name, email, registered_at from users where user_id = ?`;
+  conn.query(queryString, userId, function (err, results) {
+    if (err) {
+      return res.status(500).json({ error: "Error fetching from database" });
+    } else {
+      if (results.length == 0) {
+        return res.status(200).json({ msg: "No user found" });
+      }
+      return res.status(200).json(results);
+    }
+  });
+};
+
 exports.loginUser = (req, res) => {
   const { email, password } = req.body;
   selectString = "select email, password from users where email = ?";

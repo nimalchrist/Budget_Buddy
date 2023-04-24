@@ -1,4 +1,4 @@
-import 'package:budget_buddy/pages/editExpensePage.dart';
+import 'package:budget_buddy/pages/EditExpensePage.dart';
 import '../theme/Colors.dart';
 import 'package:flutter/material.dart';
 import '../http_Operations/httpServices.dart';

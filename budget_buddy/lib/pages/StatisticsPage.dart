@@ -48,8 +48,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
     });
   }
 
-  bool showAvg = false;
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
