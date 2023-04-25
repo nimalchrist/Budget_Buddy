@@ -21,6 +21,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
   List<CategoryModel>? _categories;
   String? _selectedDate;
   final _formKey = GlobalKey<FormState>();
+  late FocusNode expenseFocus;
 
   _AddExpensePageState({required this.userId});
 
@@ -63,6 +64,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
   void initState() {
     super.initState();
     fetchCategories();
+    expenseFocus = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    expenseFocus.dispose();
   }
 
   @override
@@ -271,31 +280,37 @@ class _AddExpensePageState extends State<AddExpensePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                              decoration: const BoxDecoration(
-                                color: Colors.pink,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(4),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(0, 0, 0, 0.2),
-                                    offset: Offset(0, 2), // Set the offset of the shadow
-                                    blurRadius: 2, // Set the blur radius of the shadow
+                            GestureDetector(
+                              onTap: () {
+                                expenseFocus.requestFocus();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                decoration: const BoxDecoration(
+                                  color: Colors.pink,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(4),
                                   ),
-                                ],
-                              ),
-                              child: const Text(
-                                "Enter Amount",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(0, 0, 0, 0.2),
+                                      offset: Offset(0, 2), // Set the offset of the shadow
+                                      blurRadius: 2, // Set the blur radius of the shadow
+                                    ),
+                                  ],
+                                ),
+                                child: const Text(
+                                  "Enter Amount",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                             TextFormField(
+                              focusNode: expenseFocus,
                               keyboardType: TextInputType.number,
                               controller: _expenseAmount,
                               cursorColor: black,

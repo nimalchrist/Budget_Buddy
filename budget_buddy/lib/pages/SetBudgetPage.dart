@@ -13,12 +13,14 @@ class SetBudgetPage extends StatefulWidget {
 
 class _SetBudgetPageState extends State<SetBudgetPage> {
   final int userId;
+
   _SetBudgetPageState({required this.userId});
   late HttpService httpService;
   bool? _isSet;
   String? _selectedDate;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _budgetAmount = TextEditingController();
+  late FocusNode _budgetAmountFocus;
 
   @override
   void initState() {
@@ -26,6 +28,7 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
     super.initState();
     httpService = HttpService();
     isButgetSetted();
+    _budgetAmountFocus = FocusNode();
   }
 
   void isButgetSetted() async {
@@ -140,33 +143,39 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Container(
-                              padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
-                              decoration: const BoxDecoration(
-                                color: Colors.pink,
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(4),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(0, 0, 0, 0.2),
-                                    offset: Offset(0, 2), // Set the offset of the shadow
-                                    blurRadius: 2, // Set the blur radius of the shadow
+                            GestureDetector(
+                              onTap: () {
+                                _budgetAmountFocus.requestFocus();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
+                                decoration: const BoxDecoration(
+                                  color: Colors.pink,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(4),
                                   ),
-                                ],
-                              ),
-                              child: const Text(
-                                "Enter Budget for this Month",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(0, 0, 0, 0.2),
+                                      offset: Offset(0, 2), // Set the offset of the shadow
+                                      blurRadius: 2, // Set the blur radius of the shadow
+                                    ),
+                                  ],
+                                ),
+                                child: const Text(
+                                  "Enter Budget for this Month",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.only(left: 12.0),
                               child: TextFormField(
+                                focusNode: _budgetAmountFocus,
                                 keyboardType: TextInputType.number,
                                 controller: _budgetAmount,
                                 cursorColor: black,
@@ -214,7 +223,26 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
                               icon: const Icon(Icons.arrow_forward),
                               color: white,
                               onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
+                                if (_selectedDate != null && _formKey.currentState!.validate()) {
+                                  List<dynamic> responses = await httpService.addBudget(
+                                    userId,
+                                    _budgetAmount.text,
+                                    _selectedDate!,
+                                  );
+                                  if (responses.length == 2) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(responses[1]),
+                                      ),
+                                    );
+                                    Navigator.pop(context, true);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(responses[0]),
+                                      ),
+                                    );
+                                  }
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(

@@ -1,8 +1,8 @@
-// ignore_for_file: unnecessary_null_comparison
-
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:budget_buddy/pages/AddCategoryPage.dart';
 import 'package:budget_buddy/pages/AddExpensePage.dart';
 import 'package:budget_buddy/pages/DailyTransactionPage.dart';
+import 'package:budget_buddy/pages/NotificationsPage.dart';
 import 'package:budget_buddy/pages/ProfilePage.dart';
 import 'package:budget_buddy/pages/SetBudgetPage.dart';
 import 'package:budget_buddy/pages/StatisticsPage.dart';
@@ -35,7 +35,7 @@ class _RootAppState extends State<RootApp> {
       StatisticsPage(
         authorisedUser: userId,
       ),
-      const IncomePage(),
+      const NotificationsPage(),
       ProfilePage(
         authorisedUser: userId,
       ),
@@ -131,7 +131,15 @@ class _RootAppState extends State<RootApp> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AddCategoryPage(),
+                            ),
+                          );
+                        },
                       ),
                       leading: const Icon(
                         Icons.category,

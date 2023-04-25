@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpService {
-  final String ip = "192.168.103.221";
+  final String ip = "192.168.191.221";
 
 // get all the posts
   Future<List<DailyTransactionModel>> getDailyTransactions(int userId, String date) async {
@@ -135,6 +135,21 @@ class HttpService {
       return data['isSet'];
     } else {
       return null;
+    }
+  }
+
+  Future<List<String>> addBudget(int userId, String amount, String date) async {
+    final url = Uri.parse('http://$ip:3000/$userId/addBudget');
+    var map = <String, dynamic>{};
+    map["budget_amount"] = amount;
+    map["budget_setting_date"] = date;
+
+    final response = await http.post(url, body: map);
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return ["200", data[0]['msg']];
+    } else {
+      return [data[0]['msg']];
     }
   }
 

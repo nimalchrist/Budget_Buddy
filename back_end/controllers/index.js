@@ -109,49 +109,6 @@ exports.addExpenseDaily = (req, res) => {
   });
 };
 
-exports.fetchCategories = (req, res) => {
-  conn.query("SELECT * FROM categories", function (err, data, fields) {
-    if (err) return err;
-    res.status(200).json(data);
-  });
-};
-
-exports.fetchGraphData = (req, res) => {
-  let userId = req.params.user_id;
-
-  const queryString = `SELECT DAY(expense_date) as day, SUM(amount) as daily_total FROM expenses WHERE user_id = ? AND MONTH(expense_date) = MONTH(CURDATE()) AND YEAR(expense_date) = YEAR(CURDATE()) GROUP BY user_id, expense_date ORDER BY day ASC`;
-
-  values = [userId];
-
-  conn.query(queryString, values, function (err, data, fields) {
-    if (err) {
-      res.status(500).json(err);
-    } else {
-      res.status(200).json(data);
-    }
-  });
-};
-
-exports.isBudgetSetted = (req, res) => {
-  const userId = req.params.user_id;
-  const month = req.params.month;
-  const year = req.params.year;
-
-  const queryString = `SELECT amount FROM budgets WHERE user_id = ? AND MONTH(income_date) = ? AND YEAR(income_date) = ?;`;
-
-  const values = [userId, month, year];
-  conn.query(queryString, values, function (err, data) {
-    if (err) {
-      res.status(500).json(err);
-    }
-    if (data.length == 0) {
-      res.status(200).json({ isSet: false });
-    } else {
-      res.status(200).json({ isSet: true });
-    }
-  });
-};
-
 exports.editExpense = (req, res) => {
   const expenseId = req.params.expense_id;
   const expenseAmount = req.body.amount;
@@ -205,6 +162,63 @@ exports.deleteExpense = (req, res) => {
   });
 };
 
+exports.addBudget = (req, res) => {
+  let userId = req.params.user_id;
+  let amount = req.body.budget_amount;
+  let income_date = req.body.budget_setting_date;
+  dateChecker = new Date(income_date);
+
+  const checkQuery =
+    "select amount from budgets where user_id = ? and month(income_date) = ? and year(income_date) = ?";
+  const budgetValues = [
+    userId,
+    dateChecker.getMonth() + 1,
+    dateChecker.getFullYear(),
+  ];
+
+  conn.query(checkQuery, budgetValues, function (budgetErr, budgetResults) {
+    if (budgetErr) {
+      return res.status(500).json([{ msg: "Server Error" }]);
+    }
+    if (budgetResults.length != 0) {
+      return res
+        .status(400)
+        .json([{ msg: "Already budget is set for this month" }]);
+    } else {
+      const queryString =
+        "Insert into budgets(user_id, amount, income_date) values(?,?,?)";
+      const values = [userId, amount, income_date];
+
+      conn.query(queryString, values, function (err, results) {
+        if (err) {
+          return res.status(500).json([{ msg: "Error with server" }]);
+        }
+        return res.status(200).json([{ msg: "Added successfully" }]);
+      });
+    }
+  });
+};
+
+exports.isBudgetSetted = (req, res) => {
+  const userId = req.params.user_id;
+  const month = req.params.month;
+  const year = req.params.year;
+
+  const queryString = `SELECT amount FROM budgets WHERE user_id = ? AND MONTH(income_date) = ? AND YEAR(income_date) = ?;`;
+
+  const values = [userId, month, year];
+  conn.query(queryString, values, function (err, data) {
+    if (err) {
+      res.status(500).json(err);
+    }
+    if (data.length == 0) {
+      res.status(200).json({ isSet: false });
+    } else {
+      res.status(200).json({ isSet: true });
+    }
+  });
+};
+
 exports.getBudgetAmount = (req, res) => {
   let userId = req.params.user_id;
   let month = req.body.current_month;
@@ -221,6 +235,29 @@ exports.getBudgetAmount = (req, res) => {
         return res.status(200).json({ budget: null });
       }
       return res.status(200).json(budget);
+    }
+  });
+};
+
+exports.fetchCategories = (req, res) => {
+  conn.query("SELECT * FROM categories", function (err, data, fields) {
+    if (err) return err;
+    res.status(200).json(data);
+  });
+};
+
+exports.fetchGraphData = (req, res) => {
+  let userId = req.params.user_id;
+
+  const queryString = `SELECT DAY(expense_date) as day, SUM(amount) as daily_total FROM expenses WHERE user_id = ? AND MONTH(expense_date) = MONTH(CURDATE()) AND YEAR(expense_date) = YEAR(CURDATE()) GROUP BY user_id, expense_date ORDER BY day ASC`;
+
+  values = [userId];
+
+  conn.query(queryString, values, function (err, data, fields) {
+    if (err) {
+      res.status(500).json(err);
+    } else {
+      res.status(200).json(data);
     }
   });
 };
