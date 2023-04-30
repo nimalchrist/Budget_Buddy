@@ -1,50 +1,20 @@
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
-// class NotificationService {
-//   static final FlutterLocalNotificationsPlugin _notificationsPlugin =
-//       FlutterLocalNotificationsPlugin();
-
-//   static Future initialize() async {
-//     final AndroidInitializationSettings initializationSettingsAndroid =
-//         AndroidInitializationSettings('@drawable/ic_launcher');
-//     final InitializationSettings initializationSettings =
-//         InitializationSettings(android: initializationSettingsAndroid);
-//     await _notificationsPlugin.initialize(initializationSettings);
-//   }
-
-//   static Future displayNotification({
-//     int id = 0,
-//     String? title,
-//     String? body,
-//   }) async {
-//     const AndroidNotificationDetails androidPlatformChannelSpecifics =
-//         AndroidNotificationDetails(
-//       'your_channel_id',
-//       'your_channel_name',
-//       importance: Importance.max,
-//       priority: Priority.high,
-//     );
-//     final NotificationDetails platformChannelSpecifics =
-//         NotificationDetails(android: androidPlatformChannelSpecifics);
-//     await _notificationsPlugin.show(
-//       id,
-//       title,
-//       body,
-//       platformChannelSpecifics,
-//       payload: 'your_payload',
-//     );
-//   }
-// }
-
 import 'dart:async';
+import 'dart:math';
 import 'package:budget_buddy/http_Operations/httpServices.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
   final int userId;
   static HttpService httpService = HttpService();
+  List<String> randomBodies = [
+    "Hey? set your budget",
+    "Neenga inum budget set panala?",
+    "Budget set pana...Itha click panunga",
+    "Budget set panunga Bro/Sis"
+  ];
 
   NotificationService({required this.userId});
   final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -56,90 +26,118 @@ class NotificationService {
         AndroidInitializationSettings('ic_launcher');
     const InitializationSettings initializationSettings =
         InitializationSettings(android: initializationSettingsAndroid);
-    await _notificationsPlugin.initialize(initializationSettings);
+    await _notificationsPlugin.initialize(
+      initializationSettings,
+    );
+
+    // Request notification permissions
+    await _requestNotificationPermissions();
 
     // Schedule notifications if the budget is not set
     bool? budgetSet = await httpService.isButgetSetted(userId);
     if (budgetSet != null) {
       if (!budgetSet) {
         print("Notifications are scheduled");
-        _scheduleNotifications();
+        _showFirstScheduledNotification(
+          payload: "Budget_Buddy",
+        );
+        _showSecondScheduledNotification(
+          payload: "Budget_buddy",
+        );
       }
     }
   }
 
-  Future _scheduleNotifications() async {
-    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'budget01',
-      'Budget Remainder',
-      channelDescription: "Hey, set the budget for this month :)",
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-    var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await _notificationsPlugin.periodicallyShow(
-      0,
-      "Set your Budget",
-      "Please set your budget for this month",
-      RepeatInterval.daily,
-      platformChannelSpecifics,
-    );
+  Future _requestNotificationPermissions() async {
+    var status = await Permission.notification.request();
+    if (status != PermissionStatus.granted) {
+      throw Exception('Notification permissions not granted');
+    }
   }
 
-  Future displayNotification({
+  Future _showFirstScheduledNotification({
     int id = 0,
-    String? title,
-    String? body,
     String? payload,
   }) async {
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
       'Budget02',
       'Manual Notification',
-      channelDescription: "You don't setted budget for this month",
+      channelDescription: "You don't set budget for this month",
       channelShowBadge: true,
       importance: Importance.max,
       priority: Priority.high,
     );
+
     var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _notificationsPlugin.show(
+
+    tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
+
+    Random random = Random();
+    var body = randomBodies[random.nextInt(randomBodies.length)];
+
+    await _notificationsPlugin.zonedSchedule(
       id,
-      title,
+      "Set BUDGET Now",
       body,
+      _scheduleDaily(
+        const Time(9, 30),
+      ),
       platformChannelSpecifics,
-      payload: 'your_payload',
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
     );
   }
+
+  Future _showSecondScheduledNotification({
+    int id = 1,
+    String? payload,
+  }) async {
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+      'Budget03',
+      'Manual Notification',
+      channelDescription: "You don't set budget for this month",
+      channelShowBadge: true,
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    var platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    tz.setLocalLocation(tz.getLocation('Asia/Kolkata'));
+
+    Random random = Random();
+    var body = randomBodies[random.nextInt(randomBodies.length)];
+
+    await _notificationsPlugin.zonedSchedule(
+      id,
+      "Set BUDGET Now",
+      body,
+      _scheduleDaily(
+        const Time(18, 30),
+      ),
+      platformChannelSpecifics,
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  static tz.TZDateTime _scheduleDaily(Time time) {
+    final now = tz.TZDateTime.now(tz.local);
+    final scheduleDate = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      time.hour,
+      time.minute,
+    );
+
+    return scheduleDate.isBefore(now)
+        ? scheduleDate.add(
+            const Duration(days: 1),
+          )
+        : scheduleDate;
+  }
 }
-
-    // var now = DateTime.now();
-
-    // var notification1Time = tz.TZDateTime(
-    //     tz.local, now.year, now.month, now.day, 16, 30, 0); // 10:00 AM
-
-    // var notification2Time = tz.TZDateTime(
-    //     tz.local, now.year, now.month, now.day, 18, 0, 0); // 6:00 PM
-
-    // Schedule the first notification
-    // await _notificationsPlugin.zonedSchedule(
-    //   0,
-    //   'Set Your Budget',
-    //   'Please set your budget for the month.',
-    //   notification1Time,
-    //   platformChannelSpecifics,
-    //   androidAllowWhileIdle: true,
-    //   uiLocalNotificationDateInterpretation:
-    //       UILocalNotificationDateInterpretation.absoluteTime,
-    // );
-
-    // // Schedule the second notification
-    // await _notificationsPlugin.zonedSchedule(
-    //   1,
-    //   'Set Your Budget',
-    //   'Please set your budget for the month',
-    //   notification2Time,
-    //   platformChannelSpecifics,
-    //   androidAllowWhileIdle: true,
-    //   uiLocalNotificationDateInterpretation:
-    //       UILocalNotificationDateInterpretation.absoluteTime,
-    // );

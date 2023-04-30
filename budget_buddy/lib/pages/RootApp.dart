@@ -35,7 +35,9 @@ class _RootAppState extends State<RootApp> {
       StatisticsPage(
         authorisedUser: userId,
       ),
-      const NotificationsPage(),
+      NotificationsPage(
+        authorisedUser: userId,
+      ),
       ProfilePage(
         authorisedUser: userId,
       ),
@@ -240,20 +242,5 @@ class _RootAppState extends State<RootApp> {
     setState(() {
       pageIndex = index;
     });
-  }
-}
-
-class IncomePage extends StatelessWidget {
-  const IncomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const SafeArea(
-      child: Scaffold(
-        body: Center(
-          child: Text("Third"),
-        ),
-      ),
-    );
   }
 }

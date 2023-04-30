@@ -71,15 +71,16 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
     return Scaffold(
       // backgroundColor: grey.withOpacity(0.05),
       appBar: AppBar(
+        elevation: 0.1,
         backgroundColor: Colors.white,
         title: const Text(
           "Monthly Budget",
           style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
-          textAlign: TextAlign.left,
         ),
-        elevation: 1,
       ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,

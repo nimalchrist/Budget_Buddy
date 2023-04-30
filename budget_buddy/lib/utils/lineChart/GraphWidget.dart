@@ -27,71 +27,76 @@ class ExpenseLineChartState extends State<ExpenseLineChart> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     fetchGraphData();
   }
 
   @override
   Widget build(BuildContext context) {
-    return _graphData != null
-        ? SfCartesianChart(
-            plotAreaBorderWidth: 0,
-            tooltipBehavior: TooltipBehavior(
-              header: 'Expense',
-              enable: true,
-              format: 'date: point.x\n Rs. point.y',
-            ),
-            zoomPanBehavior: ZoomPanBehavior(
-              enablePanning: true,
-              enablePinching: true,
-            ),
-            primaryXAxis: NumericAxis(
-              majorGridLines: const MajorGridLines(
-                width: 0,
+    return RefreshIndicator(
+      color: Colors.pink,
+      onRefresh: () async {
+        fetchGraphData();
+      },
+      child: _graphData != null
+          ? SfCartesianChart(
+              plotAreaBorderWidth: 0,
+              tooltipBehavior: TooltipBehavior(
+                header: 'Expense',
+                enable: true,
+                format: 'date: point.x\n Rs. point.y',
               ),
-              title: AxisTitle(
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+              zoomPanBehavior: ZoomPanBehavior(
+                enablePanning: true,
+                enablePinching: true,
+              ),
+              primaryXAxis: NumericAxis(
+                majorGridLines: const MajorGridLines(
+                  width: 0,
                 ),
-                text: 'Expense Date',
-              ),
-            ),
-            primaryYAxis: NumericAxis(
-              majorTickLines: const MajorTickLines(width: 0),
-              title: AxisTitle(
-                text: 'Expense Amount',
-                textStyle: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+                title: AxisTitle(
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  text: 'Expense Date',
                 ),
               ),
-            ),
-            series: <ChartSeries>[
-              LineSeries<GraphDataModel, int>(
-                animationDuration: 3,
-                color: Colors.pink,
-                dataSource: _graphData!,
-                xValueMapper: (GraphDataModel data, _) => data.day,
-                yValueMapper: (GraphDataModel data, _) => data.dailyTotal,
-              )
-            ],
-          )
-        : const Padding(
-            padding: EdgeInsets.only(
-              left: 100.0,
-              bottom: 30,
-            ),
-            child: Center(
-              child: Text(
-                "Turn on network",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              primaryYAxis: NumericAxis(
+                majorTickLines: const MajorTickLines(width: 0),
+                title: AxisTitle(
+                  text: 'Expense Amount',
+                  textStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              series: <ChartSeries>[
+                LineSeries<GraphDataModel, int>(
+                  animationDuration: 3,
+                  color: Colors.pink,
+                  dataSource: _graphData!,
+                  xValueMapper: (GraphDataModel data, _) => data.day,
+                  yValueMapper: (GraphDataModel data, _) => data.dailyTotal,
+                )
+              ],
+            )
+          : const Padding(
+              padding: EdgeInsets.only(
+                left: 100.0,
+                bottom: 30,
+              ),
+              child: Center(
+                child: Text(
+                  "Turn on network",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ),
             ),
-          );
+    );
   }
 }
