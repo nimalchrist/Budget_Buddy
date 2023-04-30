@@ -108,6 +108,7 @@
 //   }
 // }
 
+import 'package:budget_buddy/pages/SetBudgetPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -196,18 +197,36 @@ class _NotificationsPageState extends State<NotificationsPage> {
               itemCount: _notifications!.length,
               itemBuilder: (BuildContext context, int index) {
                 var notification = _notifications![index];
-                return ListTile(
-                  leading: const Icon(
-                    Icons.notifications,
-                    size: 30,
-                    color: Colors.pink,
-                  ),
-                  title: Text(notification.title!),
-                  subtitle: Text(notification.body ?? ""),
-                  onTap: () {
-                    debugPrint('notification tapped: ${notification.id}');
-                    // TODO: Navigate to the relevant screen based on the notification payload
-                  },
+                return Column(
+                  children: [
+                    ListTile(
+                      leading: const Icon(
+                        Icons.notifications,
+                        size: 30,
+                        color: Colors.pink,
+                      ),
+                      title: Text(notification.title!),
+                      subtitle: Text(notification.body ?? ""),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SetBudgetPage(authorisedUser: userId),
+                          ),
+                        );
+                      },
+                    ),
+                    Center(
+                      child: Container(
+                        width: 300,
+                        height: 1,
+                        decoration: const BoxDecoration(color: Colors.black38),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ],
                 );
               },
             )
