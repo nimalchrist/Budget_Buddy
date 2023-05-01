@@ -26,6 +26,16 @@ router
 // to get monthly balance
 router.route("/balance/:user_id").post(controllers.getMonthlyBalanceAmount);
 
+// to get list of monthly budgets
+router
+  .route("/:user_id/listOfBudgets")
+  .post(controllers.getListOfMonthlyBudgets);
+
+// to get list of m0nthly expenses
+router
+  .route("/:user_id/listOfExpenses")
+  .post(controllers.getListOfMonthlyExpenses);
+
 // to add an expense
 router.route("/:user_id/addExpense").post(controllers.addExpenseDaily);
 

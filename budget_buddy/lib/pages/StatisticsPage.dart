@@ -1,3 +1,6 @@
+import 'package:budget_buddy/pages/BudgetsPage.dart';
+import 'package:budget_buddy/pages/MonthlyExpensesPage.dart';
+
 import '../theme/Colors.dart';
 import 'package:flutter/material.dart';
 import '../http_Operations/httpServices.dart';
@@ -219,17 +222,29 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.blue,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.arrow_back,
-                                color: white,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => BudgetsPage(
+                                    authorisedUser: userId,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.blue,
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: white,
+                                ),
                               ),
                             ),
                           ),
@@ -297,17 +312,29 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.red,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.arrow_forward,
-                                color: white,
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MonthlyExpensePage(
+                                    authorisedUser: userId,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.arrow_forward,
+                                  color: white,
+                                ),
                               ),
                             ),
                           ),

@@ -3,12 +3,14 @@ import 'package:budget_buddy/main.dart';
 import 'package:budget_buddy/models/CategoryModel.dart';
 import 'package:budget_buddy/models/DailyTransactionModel.dart';
 import 'package:budget_buddy/models/GraphDataModel.dart';
+import 'package:budget_buddy/models/ListOfMonthlyBudgets.dart';
+import 'package:budget_buddy/models/ListOfMonthlyExpenses.dart';
 import 'package:budget_buddy/models/ProfileInfoModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpService {
-  final String ip = "192.168.191.221";
+  final String ip = "192.168.46.221";
 
 // get all the posts
   Future<List<DailyTransactionModel>> getDailyTransactions(int userId, String date) async {
@@ -266,6 +268,39 @@ class HttpService {
     }
   }
 
+  Future<List<ListOfMonthlyBudgets>> getListOfMonthlyBudgets(int userId) async {
+    var url = Uri.parse('http://$ip:3000/$userId/listOfBudgets');
+    http.Response res = await http.post(url);
+
+    if (res.statusCode == 200) {
+      List<dynamic> body = jsonDecode(res.body);
+      List<ListOfMonthlyBudgets> listOfBudgets = body
+          .map(
+            (dynamic item) => ListOfMonthlyBudgets.fromJson(item),
+          )
+          .toList();
+      return listOfBudgets;
+    } else {
+      throw Exception('Failed to get list of budgets');
+    }
+  }
+
+  Future<List<ListOfMonthlyExpenses>> getListOfMonthlyExpenses(int userId) async {
+    var url = Uri.parse('http://$ip:3000/$userId/listOfExpenses');
+    http.Response res = await http.post(url);
+
+    if (res.statusCode == 200) {
+      List<dynamic> body = jsonDecode(res.body);
+      List<ListOfMonthlyExpenses> listOfExpenses = body
+          .map(
+            (dynamic item) => ListOfMonthlyExpenses.fromJson(item),
+          )
+          .toList();
+      return listOfExpenses;
+    } else {
+      throw Exception('Failed to get list of expenses');
+    }
+  }
 // otp verification
   // Future<List<dynamic>> otpVerification(String otp, int userId) async {
   //   try {

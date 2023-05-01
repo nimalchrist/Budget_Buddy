@@ -71,6 +71,7 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
     return Scaffold(
       // backgroundColor: grey.withOpacity(0.05),
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0.1,
         backgroundColor: Colors.white,
         title: const Text(

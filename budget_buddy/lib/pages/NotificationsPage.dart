@@ -109,6 +109,7 @@
 // }
 
 import 'package:budget_buddy/pages/SetBudgetPage.dart';
+import 'package:budget_buddy/theme/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -205,8 +206,22 @@ class _NotificationsPageState extends State<NotificationsPage> {
                         size: 30,
                         color: Colors.pink,
                       ),
-                      title: Text(notification.title!),
-                      subtitle: Text(notification.body ?? ""),
+                      title: Text(
+                        notification.title!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.black,
+                        ),
+                      ),
+                      subtitle: Text(
+                        notification.body ?? "",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.black38,
+                        ),
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -218,9 +233,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
                     ),
                     Center(
                       child: Container(
-                        width: 300,
-                        height: 1,
-                        decoration: const BoxDecoration(color: Colors.black38),
+                        width: 250,
+                        height: 0.5,
+                        decoration: BoxDecoration(
+                          color: Colors.black38,
+                          boxShadow: [
+                            BoxShadow(
+                              color: grey.withOpacity(0.3),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              // changes position of shadow
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(

@@ -278,6 +278,32 @@ exports.getProfileInfo = (req, res) => {
   });
 };
 
+exports.getListOfMonthlyBudgets = (req, res) => {
+  let userId = req.params.user_id;
+
+  let queryString = "select amount, income_date from budgets where user_id = ?";
+
+  conn.query(queryString, userId, function (err, results) {
+    if (err) {
+      return res.status(500).json({ error: "Error fetching from database" });
+    }
+    return res.status(200).json(results);
+  });
+};
+
+exports.getListOfMonthlyExpenses = (req, res) => {
+  let userId = req.params.user_id;
+
+  let queryString = `SELECT MONTH(expense_date) AS month, SUM(amount) AS total_expenses FROM expenses WHERE user_id = ? GROUP BY MONTH(expense_date) ORDER BY MONTH(expense_date) ASC`;
+
+  conn.query(queryString, userId, function (err, results) {
+    if (err) {
+      return res.status(500).json({ error: "Error fetching from database" });
+    }
+    return res.status(200).json(results);
+  });
+};
+
 exports.loginUser = (req, res) => {
   const { email, password } = req.body;
   selectString = "select email, password from users where email = ?";
