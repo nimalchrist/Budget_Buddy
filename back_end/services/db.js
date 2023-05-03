@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   password: "Ninunimal",
   database: "budget-buddy-db",
   waitForConnections: true,
-  connectTimeout: 50000,
+  connectTimeout: 100000,
 });
 
 connection.connect(function (err) {
