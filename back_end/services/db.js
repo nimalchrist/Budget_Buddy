@@ -2,10 +2,10 @@ const mysql = require("mysql2");
 require("dotenv").config();
 
 const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: "budget-buddy-db.caxjmojddnbu.us-east-1.rds.amazonaws.com",
+  user: "admin",
+  password: "Ninunimal",
+  database: "budget-buddy-db",
 });
 
 connection.connect(function (err) {
