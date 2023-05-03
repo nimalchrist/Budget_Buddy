@@ -8,6 +8,7 @@ const connection = mysql.createConnection({
   database: "budget-buddy-db",
   waitForConnections: true,
   connectTimeout: 100000,
+  timezone: "utc",
 });
 
 connection.connect(function (err) {
