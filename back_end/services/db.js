@@ -4,7 +4,7 @@ require("dotenv").config();
 const connection = mysql.createConnection({
   host: "budget-buddy-db.caxjmojddnbu.us-east-1.rds.amazonaws.com",
   user: "admin",
-  password: "Ninunimal",
+  password: "ninunimal",
   database: "budget-buddy-db",
   waitForConnections: true,
   connectTimeout: 100000,
