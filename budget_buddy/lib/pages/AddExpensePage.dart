@@ -240,7 +240,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                     _selectDate(context);
                   },
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.pink),
+                    backgroundColor: MaterialStateProperty.all<Color>(primary),
                   ),
                   child: const Text(
                     'Select Date',
@@ -287,7 +287,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
                               child: Container(
                                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
                                 decoration: const BoxDecoration(
-                                  color: Colors.pink,
+                                  color: primary,
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(4),
                                   ),

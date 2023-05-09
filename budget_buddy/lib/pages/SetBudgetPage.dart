@@ -101,7 +101,7 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
                           _selectDate(context);
                         },
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(Colors.pink),
+                          backgroundColor: MaterialStateProperty.all<Color>(primary),
                         ),
                         child: const Text(
                           'Select Date',
@@ -152,7 +152,7 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
                               child: Container(
                                 padding: const EdgeInsets.fromLTRB(10, 12, 10, 12),
                                 decoration: const BoxDecoration(
-                                  color: Colors.pink,
+                                  color: primary,
                                   borderRadius: BorderRadius.all(
                                     Radius.circular(4),
                                   ),
@@ -270,7 +270,7 @@ class _SetBudgetPageState extends State<SetBudgetPage> {
                     child: Padding(
                       padding: EdgeInsets.all(28.0),
                       child: Text(
-                        "Your budget is already setted for this month so no need to worry about it",
+                        "Your budget is already set for this month so no need to worry about it",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black45),
                       ),

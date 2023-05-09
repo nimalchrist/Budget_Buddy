@@ -80,7 +80,7 @@ class NotificationService {
       "Set BUDGET Now",
       body,
       _scheduleDaily(
-        const Time(9, 30),
+        const Time(10, 40),
       ),
       platformChannelSpecifics,
       androidAllowWhileIdle: true,

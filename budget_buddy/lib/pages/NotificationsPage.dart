@@ -204,7 +204,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
                       leading: const Icon(
                         Icons.notifications,
                         size: 30,
-                        color: Colors.pink,
+                        color: primary,
                       ),
                       title: Text(
                         notification.title!,

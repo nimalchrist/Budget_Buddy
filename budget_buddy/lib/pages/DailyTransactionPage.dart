@@ -162,7 +162,7 @@ class _DailyTransactionPageState extends State<DailyTransactionPage>
                       dayColor: const Color(0xff67727d),
                       dayNameColor: const Color(0xFF333A47),
                       activeDayColor: Colors.white,
-                      activeBackgroundDayColor: Colors.pink,
+                      activeBackgroundDayColor: primary,
                       dotsColor: const Color(0xffffffff),
                       locale: 'en',
                       shrink: true,
