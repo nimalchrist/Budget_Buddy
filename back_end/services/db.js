@@ -5,7 +5,7 @@ const connection = mysql.createConnection({
   host: "budget-buddy-db.caxjmojddnbu.us-east-1.rds.amazonaws.com",
   user: "admin",
   password: "ninunimal",
-  database: "budget-buddy-db",
+  database: "budget_buddy_db",
   waitForConnections: true,
   timezone: "utc",
 });
