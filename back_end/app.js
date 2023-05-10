@@ -18,6 +18,6 @@ app.use(
 app.use("/", router);
 
 // server start method
-app.listen(port, function () {
+app.listen(port, "44.206.193.65", function () {
   console.log("Server started and running at port 3000");
 });
