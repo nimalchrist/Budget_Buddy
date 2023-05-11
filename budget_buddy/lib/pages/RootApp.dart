@@ -90,7 +90,7 @@ class _RootAppState extends State<RootApp> {
                       ),
                       leading: const Icon(
                         Icons.attach_money,
-                        color: Colors.pink,
+                        color: primary,
                       ),
                     ),
                     _buildListItem(
@@ -119,7 +119,7 @@ class _RootAppState extends State<RootApp> {
                       ),
                       leading: const Icon(
                         Icons.add,
-                        color: Colors.pink,
+                        color: primary,
                       ),
                     ),
                     _buildListItem(
@@ -145,7 +145,7 @@ class _RootAppState extends State<RootApp> {
                       ),
                       leading: const Icon(
                         Icons.category,
-                        color: Colors.pink,
+                        color: primary,
                       ),
                     ),
                   ],
@@ -154,7 +154,7 @@ class _RootAppState extends State<RootApp> {
             },
           );
         },
-        backgroundColor: Colors.pink,
+        backgroundColor: primary,
         child: const Icon(
           Icons.add,
           size: 25,

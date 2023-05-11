@@ -326,7 +326,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 )
               : const Center(
                   child: CircularProgressIndicator(
-                    color: Colors.pink,
+                    color: primary,
                   ),
                 ),
         ],
