@@ -21,12 +21,6 @@ class _ProfilePageState extends State<ProfilePage> {
   _ProfilePageState({required this.userId});
   int? _budget;
 
-  // void isButgetSetted() async {
-  //   bool? isSet = await httpService.isButgetSetted(userId);
-  //   setState(() {
-  //   });
-  // }
-
   void fetchBudget() async {
     int? budget = await httpService.getBudgetAmount(userId);
     setState(() {
@@ -96,8 +90,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "Profile",
                         style: TextStyle(
                           fontSize: 20,
@@ -105,7 +99,16 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: black,
                         ),
                       ),
-                      Icon(Icons.settings)
+                      IconButton(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Under development"),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.settings),
+                      )
                     ],
                   ),
                   const SizedBox(
