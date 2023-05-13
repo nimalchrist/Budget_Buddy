@@ -44,6 +44,8 @@ class NotificationService {
         _showSecondScheduledNotification(
           payload: "Budget_buddy",
         );
+      } else {
+        await _notificationsPlugin.cancelAll();
       }
     }
   }
