@@ -44,6 +44,8 @@ class NotificationService {
         _showSecondScheduledNotification(
           payload: "Budget_buddy",
         );
+      } else {
+        await _notificationsPlugin.cancelAll();
       }
     }
   }
@@ -80,7 +82,7 @@ class NotificationService {
       "Set BUDGET Now",
       body,
       _scheduleDaily(
-        const Time(10, 40),
+        const Time(9, 30),
       ),
       platformChannelSpecifics,
       androidAllowWhileIdle: true,
