@@ -37,6 +37,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
+        foregroundColor: Colors.black,
         elevation: 0.4,
         title: const Text(
           'Budget buddy',
@@ -57,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
               );
             },
             child: const Text(
-              "Sign Up",
+              "Signup",
               style: TextStyle(
                 color: Color.fromARGB(255, 255, 0, 76),
                 fontFamily: "san serif",
