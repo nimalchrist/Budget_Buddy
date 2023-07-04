@@ -73,9 +73,3 @@ Budget Buddy utilizes a MySQL database with the following table design:
 2. `income` - Tracks the income records of users, including income amount, date, and associated user ID.
 3. `expenses` - Manages the expense records of users, including expense amount, date, category, and associated user ID.
 4. `balance` - Stores the current balance for each user, including the user ID and balance amount.
-
-Feel free to explore the project's code and modify it to suit your requirements. 
-
----
-
-Please note that the above content is just an example, and you should modify it to reflect your specific Flutter app, its structure, and the database table design. Adapt the instructions and explanations to match your project's configuration and requirements.
