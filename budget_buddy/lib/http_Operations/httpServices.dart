@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HttpService {
-  final String ip = "192.168.180.221";
+  final String ip = "192.168.145.221";
 
 // get all the posts
   Future<List<DailyTransactionModel>> getDailyTransactions(int userId, String date) async {
